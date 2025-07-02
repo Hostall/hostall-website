@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://pjnqhdhlcgrrmfzscswv.supabase.co wss://pjnqhdhlcgrrmfzscswv.supabase.co https://www.google-analytics.com; frame-src 'self' https://www.google.com;">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  
+  <!-- SEO Meta Tags -->
+  <title>HOSTALL - Best Hostels in Lahore | Boys & Girls Hostels | Affordable Accommodation</title>
+  <meta name="description" content="Find the best boys and girls hostels in Lahore with HOSTALL. Compare prices, facilities, and locations for affordable student accommodation in Lahore, Pakistan.">
+  <meta name="keywords" content="hostel, hostels in lahore, boys hostel in lahore, girls hostel in lahore, lahore hostel, student accommodation lahore, affordable hostels lahore, hostall">
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="HOSTALL - Best Hostels in Lahore">
+  <meta property="og:description" content="Find verified boys and girls hostels in Lahore. Compare facilities, prices, and locations for student accommodation.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hostall.org">
+  
+  <!-- Fonts and Styling -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0NNWGNQE5Q"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0NNWGNQE5Q');
+  </script>
+  
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Google Maps JavaScript API -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKZlLFE0PClFElJlMzNjFwMTQyMzM4Q&libraries=places&callback=initMap"></script>
+  
+  <style>
+    /* Custom CSS Variables */
+    :root {
+      --primary-color: #8B5CF6;
+      --secondary-color: #FF6B6B;
+      --text-color: #1A1A1A;
+      --background-color: #F8FFFE;
+      --success-color: #10B981;
+      --warning-color: #F59E0B;
+      --error-color: #EF4444;
+    }
+    
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: var(--background-color); 
+      color: var(--text-color); 
+      line-height: 1.6; 
+    }
+    
+    /* Utility Classes */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #7C3AED;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #7C3AED 100%);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .logo .host { color: white; }
+    .logo .all { color: var(--secondary-color); }
+    
+    .nav {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .nav a {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .nav a:hover, .nav a.active {
+      color: white;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6366F1 100%);
+      color: white;
+      padding: 4rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    
+    .hero-text h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+    
+    .hero-image {
+      position: relative;
+      height: 400px;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Search Section */
+    .search-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      margin-top: -2rem;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .search-form {
+      display: flex;
+      gap: 1rem;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .form-group label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #374151;
+    }
+    
+    .form-input {
+      padding: 0.75rem;
+      border: 2px solid #E5E7EB;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    
+    .form-input:focus {
+      border-color: var(--primary-color);
+    }
+    
+    /* Stats Section */
+    .stats {
+      padding: 4rem 0;
+      background: #F9FAFB;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+    
+    .stat-item {
+      text-align: center;
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      color: #6B7280;
+      font-weight: 500;
+    }
+    
+    /* Hostels Section */
+    .hostels-section {
+      padding: 4rem 0;
+    }
+    
+    .section-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1F2937;
+      margin-bottom: 1rem;
+    }
+    
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: #6B7280;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .filter-select {
+      padding: 0.5rem 1rem;
+      border: 2px solid #E5E7EB;
+      border-radius: 0.5rem;
+      background: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    
+    .filter-select:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+    
+    /* Hostel Grid */
+    .hostel-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+    
+    .hostel-card {
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .hostel-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    .hostel-image {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+    }
+    
+    .hostel-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .hostel-card:hover .hostel-image img {
+      transform: scale(1.05);
+    }
+    
+    .hostel-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--primary-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .hostel-content {
+      padding: 1.5rem;
+    }
+    
+    .hostel-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .hostel-location {
+      color: #6B7280;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .hostel-facilities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .facility-tag {
+      background: #EBF4FF;
+      color: var(--primary-color);
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .hostel-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    /* Features Section */
+    .features {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #A855F7 50%, #C084FC 100%);
+      color: white;
+      padding: 4rem 0;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+    
+    .feature-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .feature-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    .feature-description {
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    /* Contact Section */
+    .contact {
+      padding: 4rem 0;
+      background: #F9FAFB;
+    }
+    
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    .contact-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+    
+    .contact-icon {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+    
+    .contact-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1F2937;
+    }
+    
+    .contact-info {
+      color: #6B7280;
+    }
+    
+    .contact-info a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    
+    .contact-info a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Footer */
+    .footer {
+      background: #1F2937;
+      color: white;
+      padding: 3rem 0 1rem;
+    }
+    
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .footer-section h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+    
+    .footer-section ul {
+      list-style: none;
+    }
+    
+    .footer-section ul li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .footer-section ul li a {
+      color: #D1D5DB;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .footer-section ul li a:hover {
+      color: white;
+    }
+    
+    .footer-bottom {
+      border-top: 1px solid #374151;
+      padding-top: 1rem;
+      text-align: center;
+      color: #9CA3AF;
+    }
+    
+    /* Chat Widget */
+    .chat-widget {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 1000;
+    }
+    
+    .chat-btn {
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+      transition: all 0.3s ease;
+    }
+    
+    .chat-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(37, 211, 102, 0.5);
+    }
+    
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1F2937;
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6B7280;
+    }
+    
+    .close-btn:hover {
+      color: #1F2937;
+    }
+    
+    /* Loading Spinner */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .nav {
+        display: none;
+      }
+      
+      .mobile-menu-btn {
+        display: block;
+      }
+      
+      .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      
+      .hero-text h1 {
+        font-size: 2.5rem;
+      }
+      
+      .search-form {
+        flex-direction: column;
+      }
+      
+      .form-group {
+        min-width: 100%;
+      }
+      
+      .hostel-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .filters {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .filter-select {
+        width: 100%;
+      }
+      
+      .chat-widget {
+        bottom: 1rem;
+        right: 1rem;
+      }
+      
+      .chat-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+      }
+    }
+    
+    /* Section Display Control */
+    .section {
+      display: none;
+    }
+    
+    .section.active {
+      display: block;
+    }
+    
+    /* Offline Indicator */
+    .offline-indicator {
+      display: none;
+      background: #FEF6E4;
+      color: #775E32;
+      padding: 0.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    
+    body.offline .offline-indicator {
+      display: block;
+    }
+    
+    /* Admin Styles */
+    .admin-section {
+      padding: 2rem 0;
+    }
+    
+    .admin-nav {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #E5E7EB;
+    }
+    
+    .admin-nav-item {
+      padding: 1rem 2rem;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 500;
+      color: #6B7280;
+      transition: all 0.3s ease;
+    }
+    
+    .admin-nav-item.active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+    }
+    
+    .admin-nav-item:hover {
+      color: var(--primary-color);
+    }
+    
+    .form-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Alert Styles */
+    .alert {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    
+    .alert-success {
+      background: #D1FAE5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+    }
+    
+    .alert-error {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FECACA;
+    }
+    
+    .alert-warning {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FDE68A;
+    }
+    
+    /* Night Mode */
+    body.night-mode {
+      background: #1A1A2E;
+      color: #E2E8F0;
+    }
+    
+    body.night-mode .header {
+      background: #16213E;
+    }
+    
+    body.night-mode .hero {
+      background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+    }
+    
+    body.night-mode .search-section,
+    body.night-mode .hostel-card,
+    body.night-mode .stat-item,
+    body.night-mode .contact-card,
+    body.night-mode .form-container {
+      background: #0F3460;
+      color: #E2E8F0;
+    }
+    
+    body.night-mode .form-input,
+    body.night-mode .filter-select {
+      background: #1A1A2E;
+      border-color: #2D3748;
+      color: #E2E8F0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Offline Indicator -->
+  <div class="offline-indicator">
+    🔄 You're currently offline. Your changes will be saved locally and synced when connection is restored.
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <span class="host">HOST</span><span class="all">ALL</span>
+        </div>
+        <nav class="nav">
+          <a href="#" onclick="showSection('home')" class="nav-link active">Home</a>
+          <a href="#" onclick="showSection('hostels')" class="nav-link">Browse Hostels</a>
+          <a href="#" onclick="showSection('about')" class="nav-link">About</a>
+          <a href="#" onclick="showSection('contact')" class="nav-link">Contact</a>
+          <a href="#" onclick="showSection('admin')" class="nav-link">Admin</a>
+        </nav>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Home Section -->
+  <section id="home" class="section active">
+    <!-- Hero -->
+    <div class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1>Find Your Perfect Hostel in Lahore</h1>
+            <p class="hero-subtitle">
+              Discover verified boys and girls hostels with modern facilities, 
+              affordable prices, and prime locations near universities and colleges.
+            </p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" onclick="showSection('hostels')">
+                Browse Hostels
+              </button>
+              <button class="btn btn-secondary" onclick="showSection('contact')">
+                Contact Us
+              </button>
+            </div>
+          </div>
+          <div class="hero-image">
+            <img src="./dpoac1ats0.jpg" alt="Modern hostel room" onerror="this.src='https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="container">
+      <div class="search-section">
+        <h2 style="text-align: center; margin-bottom: 1.5rem; color: #1F2937;">Find Your Ideal Hostel</h2>
+        <form class="search-form" onsubmit="searchHostels(event)">
+          <div class="form-group">
+            <label for="location">Location</label>
+            <select id="location" class="form-input">
+              <option value="">All Areas</option>
+              <option value="johar-town">Johar Town</option>
+              <option value="model-town">Model Town</option>
+              <option value="gulberg">Gulberg</option>
+              <option value="dha">DHA</option>
+              <option value="cantt">Cantt</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" class="form-input">
+              <option value="">Both</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="budget">Budget Range</label>
+            <select id="budget" class="form-input">
+              <option value="">Any Budget</option>
+              <option value="0-10000">Under Rs. 10,000</option>
+              <option value="10000-20000">Rs. 10,000 - 20,000</option>
+              <option value="20000-30000">Rs. 20,000 - 30,000</option>
+              <option value="30000+">Above Rs. 30,000</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <section class="stats">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number" id="totalHostels">150+</div>
+            <div class="stat-label">Verified Hostels</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="happyStudents">5000+</div>
+            <div class="stat-label">Happy Students</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="locations">25+</div>
+            <div class="stat-label">Locations</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="support">24/7</div>
+            <div class="stat-label">Support</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" style="color: white;">Why Choose HOSTALL?</h2>
+          <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">
+            We make finding the perfect hostel simple, safe, and reliable
+          </p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3 class="feature-title">Verified Listings</h3>
+            <p class="feature-description">
+              All hostels are personally verified for authenticity and quality standards
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <h3 class="feature-title">Best Prices</h3>
+            <p class="feature-description">
+              Compare prices and find the most affordable accommodation options
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📍</div>
+            <h3 class="feature-title">Prime Locations</h3>
+            <p class="feature-description">
+              Hostels near universities, colleges, and major transport hubs
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3 class="feature-title">Safe & Secure</h3>
+            <p class="feature-description">
+              24/7 security, CCTV surveillance, and emergency support
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- Hostels Section -->
+  <section id="hostels" class="section hostels-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Featured Hostels</h2>
+        <p class="section-subtitle">
+          Discover our top-rated hostels with excellent facilities and student reviews
+        </p>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters">
+        <select class="filter-select" id="filterGender" onchange="filterHostels()">
+          <option value="">All Genders</option>
+          <option value="male">Male Only</option>
+          <option value="female">Female Only</option>
+        </select>
+        <select class="filter-select" id="filterLocation" onchange="filterHostels()">
+          <option value="">All Locations</option>
+          <option value="johar-town">Johar Town</option>
+          <option value="model-town">Model Town</option>
+          <option value="gulberg">Gulberg</option>
+          <option value="dha">DHA</option>
+        </select>
+        <select class="filter-select" id="filterFacilities" onchange="filterHostels()">
+          <option value="">All Facilities</option>
+          <option value="wifi">WiFi</option>
+          <option value="ac">AC</option>
+          <option value="laundry">Laundry</option>
+          <option value="security">Security</option>
+        </select>
+        <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+      </div>
+
+      <!-- Hostel Grid -->
+      <div class="hostel-grid" id="hostelGrid">
+        <div class="loading" id="hostelsLoading">Loading hostels...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">About HOSTALL</h2>
+        <p class="section-subtitle">
+          Your trusted partner in finding quality accommodation in Lahore
+        </p>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; margin-bottom: 3rem;">
+        <div>
+          <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; color: #1F2937;">Our Mission</h3>
+          <p style="color: #6B7280; line-height: 1.8; margin-bottom: 1.5rem;">
+            HOSTALL was founded with a simple mission: to make finding quality, affordable accommodation 
+            easier for students in Lahore. We understand the challenges students face when looking for 
+            a safe, comfortable place to live while pursuing their education.
+          </p>
+          <p style="color: #6B7280; line-height: 1.8;">
+            Our platform connects students with verified hostels that meet our strict quality standards, 
+            ensuring a safe and comfortable living experience for all our users.
+          </p>
+        </div>
+        <div style="text-align: center;">
+          <img src="./screenshot_effb.png" alt="About HOSTALL" style="width: 100%; max-width: 400px; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1);" onerror="this.src='https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'">
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">5+</div>
+          <div class="stat-label">Years of Experience</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">98%</div>
+          <div class="stat-label">Customer Satisfaction</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Verified Hostels</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Customer Support</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section contact">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Get in Touch</h2>
+        <p class="section-subtitle">
+          Have questions? We're here to help you find your perfect accommodation
+        </p>
+      </div>
+      
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="contact-icon">📱</div>
+          <h3 class="contact-title">Call Us</h3>
+          <div class="contact-info">
+            <a href="tel:+923331536041">+92-333-1536041</a>
+          </div>
+        </div>
+        
+        <div class="contact-card">
+          <div class="contact-icon">📧</div>
+          <h3 class="contact-title">Email Us</h3>
+          <div class="contact-info">
+            <a href="mailto:teamhostall@gmail.com">teamhostall@gmail.com</a>
+          </div>
+        </div>
+        
+        <div class="contact-card">
+          <div class="contact-icon">💬</div>
+          <h3 class="contact-title">WhatsApp</h3>
+          <div class="contact-info">
+            <a href="https://wa.me/923331536041" target="_blank">Chat with us</a>
+          </div>
+        </div>
+        
+        <div class="contact-card">
+          <div class="contact-icon">📍</div>
+          <h3 class="contact-title">Visit Us</h3>
+          <div class="contact-info">
+            Lahore, Punjab<br>Pakistan
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Admin Section -->
+  <section id="admin" class="section admin-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Admin Dashboard</h2>
+        <p class="section-subtitle">Manage hostels and user accounts</p>
+      </div>
+
+      <!-- Login Form (shown when not logged in) -->
+      <div id="adminLogin" class="form-container">
+        <h3 style="text-align: center; margin-bottom: 1.5rem;">Admin Login</h3>
+        <form onsubmit="adminLogin(event)">
+          <div class="form-group">
+            <label for="adminEmail">Email:</label>
+            <input type="email" id="adminEmail" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label for="adminPassword">Password:</label>
+            <input type="password" id="adminPassword" class="form-input" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+        </form>
+      </div>
+
+      <!-- Admin Dashboard (shown when logged in) -->
+      <div id="adminDashboard" style="display: none;">
+        <div class="admin-nav">
+          <button class="admin-nav-item active" onclick="showAdminTab('hostels')">Manage Hostels</button>
+          <button class="admin-nav-item" onclick="showAdminTab('users')">Manage Users</button>
+          <button class="admin-nav-item" onclick="showAdminTab('analytics')">Analytics</button>
+          <button class="admin-nav-item" onclick="adminLogout()">Logout</button>
+        </div>
+
+        <!-- Manage Hostels Tab -->
+        <div id="adminHostels" class="admin-tab">
+          <div class="form-container">
+            <h3>Add New Hostel</h3>
+            <form onsubmit="addHostel(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="hostelName">Hostel Name:</label>
+                  <input type="text" id="hostelName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label for="hostelGender">Gender:</label>
+                  <select id="hostelGender" class="form-input" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="hostelLocation">Location:</label>
+                  <input type="text" id="hostelLocation" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label for="hostelPhone">Phone:</label>
+                  <input type="tel" id="hostelPhone" class="form-input" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="hostelDetails">Details:</label>
+                <textarea id="hostelDetails" class="form-input" rows="4" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="hostelFacilities">Facilities:</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem;">
+                  <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" value="wifi"> WiFi
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" value="ac"> AC
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" value="security"> Security
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" value="laundry"> Laundry
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" value="meals"> Meals
+                  </label>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">Add Hostel</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Manage Users Tab -->
+        <div id="adminUsers" class="admin-tab" style="display: none;">
+          <div class="form-container">
+            <h3>User Management</h3>
+            <p>User management features will be available here.</p>
+          </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="adminAnalytics" class="admin-tab" style="display: none;">
+          <div class="form-container">
+            <h3>Analytics Dashboard</h3>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-number" id="analyticsHostels">0</div>
+                <div class="stat-label">Total Hostels</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="analyticsViews">0</div>
+                <div class="stat-label">Page Views</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="analyticsUsers">0</div>
+                <div class="stat-label">Total Users</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="analyticsInquiries">0</div>
+                <div class="stat-label">Inquiries</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>HOSTALL</h3>
+          <p style="color: #D1D5DB; line-height: 1.6;">
+            Your trusted partner for finding quality hostels in Lahore. 
+            Safe, affordable, and convenient accommodation for students.
+          </p>
+        </div>
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#" onclick="showSection('home')">Home</a></li>
+            <li><a href="#" onclick="showSection('hostels')">Browse Hostels</a></li>
+            <li><a href="#" onclick="showSection('about')">About Us</a></li>
+            <li><a href="#" onclick="showSection('contact')">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Popular Areas</h3>
+          <ul>
+            <li><a href="#">Johar Town</a></li>
+            <li><a href="#">Model Town</a></li>
+            <li><a href="#">Gulberg</a></li>
+            <li><a href="#">DHA</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Contact Info</h3>
+          <ul>
+            <li>📱 +92-333-1536041</li>
+            <li>📧 teamhostall@gmail.com</li>
+            <li>📍 Lahore, Punjab, Pakistan</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 HOSTALL. All rights reserved. | Made with ❤️ for students</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Chat Widget -->
+  <div class="chat-widget">
+    <button class="chat-btn" onclick="openWhatsApp()" title="Chat with us on WhatsApp">
+      💬
+    </button>
+  </div>
+
+  <!-- Hostel Details Modal -->
+  <div id="hostelModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalHostelName">Hostel Details</h2>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modalHostelContent">
+        <!-- Content will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="./app.js"></script>
+  <script>
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeApp();
+      loadHostels();
+      updateStats();
+    });
+
+    // Supabase Configuration
+    let supabase = null;
+    let currentUser = null;
+
+    // Initialize Supabase
+    function initializeSupabase() {
+      const supabaseUrl = 'https://pjnqhdhlcgrrmfzscswv.supabase.co';
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqbnFoZGhsY2dycm1menNjc3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUzMDM2OTUsImV4cCI6MjA1MDg3OTY5NX0.gOj_fmvZdsaQCi2jWPSdGpIBIorlRCXVrR5FvuOQhGs';
+      
+      try {
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        console.log('Supabase initialized successfully');
+      } catch (error) {
+        console.error('Error initializing Supabase:', error);
+      }
+    }
+
+    // Initialize the application
+    function initializeApp() {
+      initializeSupabase();
+      setupEventListeners();
+      checkOnlineStatus();
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Online/offline status
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+      
+      // Navigation
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const section = this.getAttribute('onclick').match(/'(\w+)'/)[1];
+          showSection(section);
+        });
+      });
+    }
+
+    // Section navigation
+    function showSection(sectionName) {
+      // Hide all sections
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+      });
+      
+      // Show selected section
+      const targetSection = document.getElementById(sectionName);
+      if (targetSection) {
+        targetSection.classList.add('active');
+      }
+      
+      // Update navigation
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      
+      event.target.classList.add('active');
+      
+      // Load section-specific data
+      if (sectionName === 'hostels') {
+        loadHostels();
+      } else if (sectionName === 'admin') {
+        checkAdminAuth();
+      }
+    }
+
+    // Sample hostels data
+    const sampleHostels = [
+      {
+        id: 1,
+        name: "Sunrise Boys Hostel",
+        gender: "male",
+        location: "Johar Town, Lahore",
+        details: "Modern facilities with AC rooms, WiFi, and 24/7 security. Monthly rent: Rs. 15,000",
+        phone: "+92-300-1234567",
+        whatsapp: "+92-300-1234567",
+        facilities: ["wifi", "ac", "security", "laundry"],
+        image: "./0bjsk64il7.png"
+      },
+      {
+        id: 2,
+        name: "Golden View Girls Hostel",
+        gender: "female",
+        location: "Model Town, Lahore",
+        details: "Safe and comfortable accommodation for female students. Monthly rent: Rs. 18,000",
+        phone: "+92-300-7654321",
+        whatsapp: "+92-300-7654321",
+        facilities: ["wifi", "ac", "security", "meals"],
+        image: "./0iyg8pt240.png"
+      },
+      {
+        id: 3,
+        name: "Elite Student Lodge",
+        gender: "male",
+        location: "Gulberg, Lahore",
+        details: "Premium hostel with study rooms and recreational facilities. Monthly rent: Rs. 22,000",
+        phone: "+92-300-9876543",
+        whatsapp: "+92-300-9876543",
+        facilities: ["wifi", "ac", "security", "laundry", "meals"],
+        image: "./0tjbw7b65f.png"
+      }
+    ];
+
+    // Load hostels
+    async function loadHostels() {
+      const grid = document.getElementById('hostelGrid');
+      const loading = document.getElementById('hostelsLoading');
+      
+      loading.style.display = 'block';
+      
+      try {
+        let hostels = [];
+        
+        // Try to load from Supabase first
+        if (supabase) {
+          const { data, error } = await supabase
+            .from('hostels')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (!error && data) {
+            hostels = data;
+          }
+        }
+        
+        // If no data from Supabase, use sample data
+        if (hostels.length === 0) {
+          hostels = sampleHostels;
+        }
+        
+        displayHostels(hostels);
+      } catch (error) {
+        console.error('Error loading hostels:', error);
+        displayHostels(sampleHostels);
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    // Display hostels
+    function displayHostels(hostels) {
+      const grid = document.getElementById('hostelGrid');
+      const loading = document.getElementById('hostelsLoading');
+      
+      // Clear existing content except loading
+      Array.from(grid.children).forEach(child => {
+        if (child.id !== 'hostelsLoading') {
+          child.remove();
+        }
+      });
+      
+      if (hostels.length === 0) {
+        grid.innerHTML = '<div style="text-align: center; grid-column: 1/-1; padding: 2rem;"><p>No hostels found matching your criteria.</p></div>';
+        return;
+      }
+      
+      hostels.forEach(hostel => {
+        const card = createHostelCard(hostel);
+        grid.appendChild(card);
+      });
+    }
+
+    // Create hostel card
+    function createHostelCard(hostel) {
+      const card = document.createElement('div');
+      card.className = 'hostel-card';
+      card.onclick = () => showHostelDetails(hostel);
+      
+      const facilitiesHtml = hostel.facilities ? 
+        hostel.facilities.map(facility => 
+          `<span class="facility-tag">${facility}</span>`
+        ).join('') : '';
+      
+      card.innerHTML = `
+        <div class="hostel-image">
+          <img src="${hostel.image || hostel.img || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}" 
+               alt="${hostel.name}" 
+               onerror="this.src='https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'">
+          <div class="hostel-badge">${hostel.gender === 'male' ? 'Boys' : 'Girls'}</div>
+        </div>
+        <div class="hostel-content">
+          <h3 class="hostel-name">${hostel.name}</h3>
+          <div class="hostel-location">
+            📍 ${hostel.location}
+          </div>
+          <div class="hostel-facilities">
+            ${facilitiesHtml}
+          </div>
+          <div class="hostel-actions">
+            <button class="btn btn-primary" onclick="event.stopPropagation(); showHostelDetails(${JSON.stringify(hostel).replace(/"/g, '&quot;')})">
+              View Details
+            </button>
+            <button class="btn btn-secondary" onclick="event.stopPropagation(); contactHostel('${hostel.whatsapp || hostel.phone}')">
+              Contact
+            </button>
+          </div>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    // Show hostel details in modal
+    function showHostelDetails(hostel) {
+      const modal = document.getElementById('hostelModal');
+      const nameElement = document.getElementById('modalHostelName');
+      const contentElement = document.getElementById('modalHostelContent');
+      
+      nameElement.textContent = hostel.name;
+      
+      const facilitiesHtml = hostel.facilities ? 
+        hostel.facilities.map(facility => 
+          `<span class="facility-tag">${facility}</span>`
+        ).join('') : '';
+      
+      contentElement.innerHTML = `
+        <div style="margin-bottom: 1rem;">
+          <img src="${hostel.image || hostel.img || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}" 
+               alt="${hostel.name}" 
+               style="width: 100%; height: 250px; object-fit: cover; border-radius: 0.5rem;"
+               onerror="this.src='https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <strong>Gender:</strong> ${hostel.gender === 'male' ? 'Boys Only' : 'Girls Only'}
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <strong>Location:</strong> ${hostel.location}
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <strong>Details:</strong><br>
+          ${hostel.details}
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <strong>Facilities:</strong><br>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+            ${facilitiesHtml}
+          </div>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <strong>Contact:</strong><br>
+          📱 ${hostel.phone}<br>
+          💬 ${hostel.whatsapp}
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn btn-primary" onclick="contactHostel('${hostel.whatsapp || hostel.phone}')">
+            Contact Now
+          </button>
+          <button class="btn btn-secondary" onclick="openWhatsApp('${hostel.whatsapp || hostel.phone}')">
+            WhatsApp
+          </button>
+        </div>
+      `;
+      
+      modal.classList.add('active');
+    }
+
+    // Close modal
+    function closeModal() {
+      document.getElementById('hostelModal').classList.remove('active');
+    }
+
+    // Contact hostel
+    function contactHostel(phone) {
+      window.open(`tel:${phone}`, '_self');
+    }
+
+    // Open WhatsApp
+    function openWhatsApp(phone = '+923331536041') {
+      const message = encodeURIComponent('Hi! I found your hostel on HOSTALL and I\'m interested in learning more about accommodation options.');
+      window.open(`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${message}`, '_blank');
+    }
+
+    // Filter hostels
+    function filterHostels() {
+      const genderFilter = document.getElementById('filterGender').value;
+      const locationFilter = document.getElementById('filterLocation').value;
+      const facilitiesFilter = document.getElementById('filterFacilities').value;
+      
+      // This would normally filter from the database
+      // For now, we'll filter the sample data
+      let filtered = sampleHostels;
+      
+      if (genderFilter) {
+        filtered = filtered.filter(hostel => hostel.gender === genderFilter);
+      }
+      
+      if (locationFilter) {
+        filtered = filtered.filter(hostel => 
+          hostel.location.toLowerCase().includes(locationFilter.replace('-', ' '))
+        );
+      }
+      
+      if (facilitiesFilter) {
+        filtered = filtered.filter(hostel => 
+          hostel.facilities && hostel.facilities.includes(facilitiesFilter)
+        );
+      }
+      
+      displayHostels(filtered);
+    }
+
+    // Clear filters
+    function clearFilters() {
+      document.getElementById('filterGender').value = '';
+      document.getElementById('filterLocation').value = '';
+      document.getElementById('filterFacilities').value = '';
+      loadHostels();
+    }
+
+    // Search hostels
+    function searchHostels(event) {
+      event.preventDefault();
+      
+      const location = document.getElementById('location').value;
+      const gender = document.getElementById('gender').value;
+      const budget = document.getElementById('budget').value;
+      
+      // Navigate to hostels section
+      showSection('hostels');
+      
+      // Apply filters
+      if (location) document.getElementById('filterLocation').value = location;
+      if (gender) document.getElementById('filterGender').value = gender;
+      
+      filterHostels();
+    }
+
+    // Admin functions
+    function checkAdminAuth() {
+      const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+      
+      if (isLoggedIn) {
+        document.getElementById('adminLogin').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'block';
+        updateAnalytics();
+      } else {
+        document.getElementById('adminLogin').style.display = 'block';
+        document.getElementById('adminDashboard').style.display = 'none';
+      }
+    }
+
+    // Admin login
+    async function adminLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('adminEmail').value;
+      const password = document.getElementById('adminPassword').value;
+      
+      // Simple demo authentication
+      if (email === 'admin@hostall.com' && password === 'admin123') {
+        localStorage.setItem('adminLoggedIn', 'true');
+        checkAdminAuth();
+        showAlert('Login successful!', 'success');
+      } else {
+        showAlert('Invalid credentials. Use admin@hostall.com / admin123', 'error');
+      }
+    }
+
+    // Admin logout
+    function adminLogout() {
+      localStorage.removeItem('adminLoggedIn');
+      checkAdminAuth();
+      showAlert('Logged out successfully!', 'success');
+    }
+
+    // Show admin tab
+    function showAdminTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.style.display = 'none';
+      });
+      
+      // Show selected tab
+      const targetTab = document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+      if (targetTab) {
+        targetTab.style.display = 'block';
+      }
+      
+      // Update navigation
+      document.querySelectorAll('.admin-nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      event.target.classList.add('active');
+      
+      if (tabName === 'analytics') {
+        updateAnalytics();
+      }
+    }
+
+    // Add hostel
+    async function addHostel(event) {
+      event.preventDefault();
+      
+      const formData = {
+        name: document.getElementById('hostelName').value,
+        gender: document.getElementById('hostelGender').value,
+        location: document.getElementById('hostelLocation').value,
+        phone: document.getElementById('hostelPhone').value,
+        details: document.getElementById('hostelDetails').value,
+        facilities: Array.from(document.querySelectorAll('#adminHostels input[type="checkbox"]:checked')).map(cb => cb.value),
+        whatsapp: document.getElementById('hostelPhone').value,
+        created_at: new Date().toISOString()
+      };
+      
+      try {
+        if (supabase) {
+          const { data, error } = await supabase
+            .from('hostels')
+            .insert([formData]);
+          
+          if (error) throw error;
+        }
+        
+        showAlert('Hostel added successfully!', 'success');
+        event.target.reset();
+        loadHostels();
+      } catch (error) {
+        console.error('Error adding hostel:', error);
+        showAlert('Error adding hostel. Please try again.', 'error');
+      }
+    }
+
+    // Update analytics
+    function updateAnalytics() {
+      document.getElementById('analyticsHostels').textContent = sampleHostels.length;
+      document.getElementById('analyticsViews').textContent = '1,234';
+      document.getElementById('analyticsUsers').textContent = '456';
+      document.getElementById('analyticsInquiries').textContent = '89';
+    }
+
+    // Update stats
+    function updateStats() {
+      // These would normally come from your database
+      document.getElementById('totalHostels').textContent = '150+';
+      document.getElementById('happyStudents').textContent = '5,000+';
+      document.getElementById('locations').textContent = '25+';
+      document.getElementById('support').textContent = '24/7';
+    }
+
+    // Handle online/offline status
+    function handleOnline() {
+      document.body.classList.remove('offline');
+      console.log('Connection restored');
+    }
+
+    function handleOffline() {
+      document.body.classList.add('offline');
+      console.log('Connection lost');
+    }
+
+    function checkOnlineStatus() {
+      if (!navigator.onLine) {
+        handleOffline();
+      }
+    }
+
+    // Show alert
+    function showAlert(message, type = 'info') {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.textContent = message;
+      
+      // Insert at top of current section
+      const activeSection = document.querySelector('.section.active');
+      if (activeSection) {
+        activeSection.insertBefore(alertDiv, activeSection.firstChild);
+        
+        // Remove after 5 seconds
+        setTimeout(() => {
+          alertDiv.remove();
+        }, 5000);
+      }
+    }
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      // This would implement mobile menu functionality
+      console.log('Mobile menu toggled');
+    }
+
+    // Google Maps initialization
+    function initMap() {
+      // This would initialize Google Maps for hostel locations
+      console.log('Google Maps initialized');
+    }
+
+    // Make functions globally available
+    window.showSection = showSection;
+    window.showHostelDetails = showHostelDetails;
+    window.closeModal = closeModal;
+    window.contactHostel = contactHostel;
+    window.openWhatsApp = openWhatsApp;
+    window.filterHostels = filterHostels;
+    window.clearFilters = clearFilters;
+    window.searchHostels = searchHostels;
+    window.adminLogin = adminLogin;
+    window.adminLogout = adminLogout;
+    window.showAdminTab = showAdminTab;
+    window.addHostel = addHostel;
+    window.toggleMobileMenu = toggleMobileMenu;
+    window.initMap = initMap;
+  </script>
+</body>
+</html>
