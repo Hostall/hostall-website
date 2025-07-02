@@ -8,7 +8,7 @@ The HOSTALL team takes security issues very seriously. We appreciate your effort
 
 **DO NOT** file a public issue or pull request. Instead, please send your report privately using one of these methods:
 
-1. **Email**: Send details to security@hostall.com
+1. **Email**: Send details to teamhosatll@gmail.com
 2. **GitHub Security Advisories**: Go to the repository → Security → Advisories → New advisory
 
 Please include the following information in your report:
@@ -68,7 +68,7 @@ Security patches are released as soon as possible after vulnerabilities are conf
 
 1. Watch the repository for release notifications
 2. Check release notes for security-related updates
-3. Follow our [update guide](https://docs.hostall.com/updates) for smooth updates
+3. Follow our [update guide](https://docs.hostall.org/updates) for smooth updates
 
 ## Security Best Practices
 
