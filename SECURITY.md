@@ -8,7 +8,7 @@ The HOSTALL team takes security issues very seriously. We appreciate your effort
 
 **DO NOT** file a public issue or pull request. Instead, please send your report privately using one of these methods:
 
-1. **Email**: Send details to teamhosatll@gmail.com
+1. **Email**: Send details to teamhostall@gmail.com
 2. **GitHub Security Advisories**: Go to the repository → Security → Advisories → New advisory
 
 Please include the following information in your report:
