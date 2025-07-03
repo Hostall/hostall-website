@@ -1,13 +1,15 @@
 /**
- * HOSTALL Domain and Cache Fix - CROSS DEVICE SYNC
+ * HOSTALL Domain and Cache Fix - NUCLEAR VERSION
  * 
  * This script helps solve issues with domain linking and cache problems.
  * It forces a hard refresh of assets and implements versioning to ensure
  * all devices get the latest content across different browsers and networks.
+ * 
+ * NUCLEAR VERSION - FOR COMPLETE CROSS-DEVICE RESET
  */
 
 // Current version - update this with each deployment
-const HOSTALL_VERSION = '2025-07-03-13:07';
+const HOSTALL_VERSION = '2025-07-03-NUCLEAR-FIX';
 
 // Cross-device cache busting configuration
 const CACHE_BUST_CONFIG = {
@@ -18,7 +20,7 @@ const CACHE_BUST_CONFIG = {
   // Add random timestamp to all requests
   useRandomTimestamp: true,
   // Maximum cache age (in seconds)
-  maxCacheAge: 300 // 5 minutes
+  maxCacheAge: 0 // No caching whatsoever
 };
 
 // Domain configuration (used for canonical URLs and Open Graph)
@@ -34,16 +36,16 @@ const DOMAIN_CONFIG = {
   }
 };
 
-// Initialize domain configuration
+// Initialize domain configuration with NUCLEAR OPTION
 (function() {
-  console.log(`🚀 HOSTALL ${HOSTALL_VERSION} - Domain Fix Active`);
-  console.log(`🔄 Loaded at: ${new Date().toISOString()}`);
+  console.log(`🚨 HOSTALL ${HOSTALL_VERSION} - NUCLEAR FIX ACTIVE`);
+  console.log(`⚡ NUCLEAR RELOAD at: ${new Date().toISOString()}`);
 
-  // Update cache control headers
-  applyStrongCacheHeaders();
+  // Update cache control headers - NUCLEAR STRENGTH
+  applyNuclearCacheHeaders();
   
-  // Force reload JS and CSS with version parameters
-  versionizeAssets();
+  // Force reload JS and CSS with random version parameters
+  nuclearlizeAssets();
   
   // Update canonical URLs and Open Graph metadata
   updateMetadataTags();
@@ -53,119 +55,142 @@ const DOMAIN_CONFIG = {
 
   // Save version in localStorage for easy checking
   localStorage.setItem('HOSTALL_VERSION', HOSTALL_VERSION);
+  localStorage.setItem('HOSTALL_NUCLEAR_TIMESTAMP', Date.now().toString());
   
   // Display version in console for debugging
   window.addEventListener('load', () => {
     showVersionInfo();
+    
+    // Clear cache in 1 second after load
+    setTimeout(() => {
+      nukeAllCaches();
+    }, 1000);
   });
+  
+  // Set a forced reload in case nothing else worked
+  setTimeout(() => {
+    forceHardRefresh();
+  }, 60000); // 1 minute timeout
 })();
 
 /**
- * Apply strong cache-busting headers to prevent browser caching
+ * Apply nuclear strength cache-busting headers
  */
-function applyStrongCacheHeaders() {
-  // Add meta tags dynamically if they don't exist
+function applyNuclearCacheHeaders() {
+  // Add meta tags dynamically with nuclear strength
   const metaTags = [
-    {name: 'Cache-Control', content: 'no-cache, no-store, must-revalidate, max-age=0'},
+    {name: 'Cache-Control', content: 'no-cache, no-store, must-revalidate, max-age=0, private, stale-while-revalidate=0, stale-if-error=0'},
     {name: 'Pragma', content: 'no-cache'},
-    {name: 'Expires', content: '0'},
+    {name: 'Expires', content: '-1'},
     {name: 'version', content: HOSTALL_VERSION}
   ];
   
   metaTags.forEach(meta => {
-    if (!document.querySelector(`meta[http-equiv="${meta.name}"]`)) {
-      const metaTag = document.createElement('meta');
-      metaTag.setAttribute('http-equiv', meta.name);
-      metaTag.setAttribute('content', meta.content);
-      document.head.appendChild(metaTag);
+    // Remove any existing meta tag first
+    const existingTag = document.querySelector(`meta[http-equiv="${meta.name}"]`);
+    if (existingTag) {
+      existingTag.remove();
     }
+    
+    // Add new meta tag
+    const metaTag = document.createElement('meta');
+    metaTag.setAttribute('http-equiv', meta.name);
+    metaTag.setAttribute('content', meta.content);
+    document.head.appendChild(metaTag);
   });
   
-  // Add version meta tag
-  if (!document.querySelector('meta[name="version"]')) {
-    const versionMeta = document.createElement('meta');
+  // Update version meta tag
+  let versionMeta = document.querySelector('meta[name="version"]');
+  if (versionMeta) {
+    versionMeta.setAttribute('content', HOSTALL_VERSION);
+  } else {
+    versionMeta = document.createElement('meta');
     versionMeta.setAttribute('name', 'version');
     versionMeta.setAttribute('content', HOSTALL_VERSION);
     document.head.appendChild(versionMeta);
   }
+  
+  // Add a nuclear flag meta tag
+  const nuclearMeta = document.createElement('meta');
+  nuclearMeta.setAttribute('name', 'nuclear-reset');
+  nuclearMeta.setAttribute('content', 'true');
+  document.head.appendChild(nuclearMeta);
 }
 
 /**
  * Add version parameters to all JavaScript and CSS resources
- * Enhanced for cross-device synchronization
+ * NUCLEAR VERSION - Maximum cache busting
  */
-function versionizeAssets() {
-  // Force reload all scripts with version parameter
+function nuclearlizeAssets() {
+  // Force reload all assets with nuclear timestamp
   setTimeout(() => {
-    const timestamp = CACHE_BUST_CONFIG.useRandomTimestamp ? 
-      Date.now() : HOSTALL_VERSION.replace(/[-:]/g, '');
+    const timestamp = Date.now();
     
-    // Process script tags
+    // Process script tags with forced reload
     document.querySelectorAll('script[src]').forEach(script => {
-      if (script.src && !script.src.includes('?v=')) {
+      if (script.src) {
         const currentSrc = script.src;
-        let newSrc;
+        const newSrc = `${currentSrc.split('?')[0]}?nuclear=${timestamp}&r=${Math.random()}`;
         
-        if (CACHE_BUST_CONFIG.enableAggressiveBusting) {
-          // Add both version and timestamp for maximum cache busting
-          newSrc = `${currentSrc}?v=${timestamp}&cb=${Date.now()}`;
-        } else {
-          newSrc = addVersionParameter(currentSrc);
-        }
+        const newScript = document.createElement('script');
+        Array.from(script.attributes).forEach(attr => {
+          if (attr.name !== 'src') {
+            newScript.setAttribute(attr.name, attr.value);
+          }
+        });
+        newScript.src = newSrc;
         
-        if (currentSrc !== newSrc && CACHE_BUST_CONFIG.forceAssetReload) {
-          const newScript = document.createElement('script');
-          Array.from(script.attributes).forEach(attr => {
-            if (attr.name !== 'src') {
-              newScript.setAttribute(attr.name, attr.value);
-            }
-          });
-          newScript.src = newSrc;
+        if (script.parentNode) {
           script.parentNode.replaceChild(newScript, script);
         }
       }
     });
     
-    // Process CSS links with aggressive cache busting
+    // Process CSS links with nuclear cache busting
     document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
-      if (link.href && !link.href.includes('?v=')) {
-        if (CACHE_BUST_CONFIG.enableAggressiveBusting) {
-          link.href = `${link.href}?v=${timestamp}&cb=${Date.now()}`;
-        } else {
-          link.href = addVersionParameter(link.href);
-        }
+      if (link.href) {
+        link.href = `${link.href.split('?')[0]}?nuclear=${timestamp}&r=${Math.random()}`;
       }
     });
     
-    // Process images with cache busting
+    // Process images with nuclear cache busting
     document.querySelectorAll('img').forEach(img => {
-      if (img.src && !img.src.includes('?v=') && !img.src.startsWith('data:')) {
-        if (CACHE_BUST_CONFIG.enableAggressiveBusting && !img.src.includes('supabase')) {
-          // Don't add cache busting to Supabase images
-          img.src = `${img.src}?v=${timestamp}&cb=${Date.now()}`;
-        } else {
-          img.src = addVersionParameter(img.src);
-        }
+      if (img.src && !img.src.startsWith('data:')) {
+        img.src = `${img.src.split('?')[0]}?nuclear=${timestamp}&r=${Math.random()}`;
       }
     });
     
-    console.log('🔄 Assets versionized with cache-busting parameters');
-  }, 1000);
+    console.log('⚡ Assets nuclearlized with maximum cache-busting parameters');
+  }, 500);
 }
 
 /**
- * Add version parameter to a URL
+ * Nuke all browser caches
  */
-function addVersionParameter(url) {
-  if (!url) return url;
-  
-  // Skip for external CDNs and data URLs
-  if (url.includes('cdn.') || url.includes('unpkg.com') || url.startsWith('data:')) {
-    return url;
+function nukeAllCaches() {
+  // Clear browser cache via cache API if available
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(name => {
+        console.log('🔥 Nuking cache:', name);
+        caches.delete(name);
+      });
+    });
   }
   
-  const separator = url.includes('?') ? '&' : '?';
-  return `${url.split('?')[0]}${separator}v=${HOSTALL_VERSION}`;
+  // Clear localStorage except crucial items
+  const preserveKeys = ['auth', 'supabase.auth.token'];
+  Object.keys(localStorage).forEach(key => {
+    if (!preserveKeys.includes(key)) {
+      localStorage.removeItem(key);
+    }
+  });
+  
+  // Reset HOSTALL version in localStorage
+  localStorage.setItem('HOSTALL_VERSION', HOSTALL_VERSION);
+  localStorage.setItem('HOSTALL_NUCLEAR_TIMESTAMP', Date.now().toString());
+  
+  console.log('💥 All caches nuked');
 }
 
 /**
@@ -204,11 +229,12 @@ function updateMetadataTags() {
  * Display version info in console for debugging
  */
 function showVersionInfo() {
-  const style = 'background: #8B5CF6; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;';
-  console.log('%c HOSTALL VERSION INFO ', style);
+  const style = 'background: #EF4444; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;';
+  console.log('%c 🚨 HOSTALL NUCLEAR VERSION INFO 🚨 ', style);
   console.log(`📋 Current Version: ${HOSTALL_VERSION}`);
   console.log(`🌐 Domain: ${DOMAIN_CONFIG.fullDomain}`);
   console.log(`⏱️ Page Loaded: ${new Date().toLocaleTimeString()}`);
+  console.log(`🔥 Nuclear Timestamp: ${new Date().toISOString()}`);
   
   // Detect if running from original domain
   const currentDomain = window.location.hostname;
@@ -232,7 +258,7 @@ function initCrossDeviceSync() {
   
   console.log('🔄 Initializing cross-device sync for admin');
   
-  // Set up more frequent sync (every 10 seconds)
+  // Set up more frequent sync (every 5 seconds)
   setInterval(() => {
     if (window.supabase) {
       if (typeof loadHostelsFromSupabase === 'function') {
@@ -240,7 +266,7 @@ function initCrossDeviceSync() {
         console.log(`🔄 Cross-device sync at ${new Date().toLocaleTimeString()}`);
       }
     }
-  }, 10000);
+  }, 5000);
   
   // Set up localStorage versioning to detect stale data
   const storageVersion = localStorage.getItem('HOSTALL_VERSION');
@@ -253,7 +279,7 @@ function initCrossDeviceSync() {
       if (typeof loadHostelsFromSupabase === 'function') {
         loadHostelsFromSupabase();
       }
-    }, 2000);
+    }, 1000);
   }
 }
 
@@ -330,7 +356,7 @@ window.checkDNSPropagation = function() {
           DNS propagation can take 24-48 hours to complete worldwide.
           <ul style="margin-top: 10px; padding-left: 20px;">
             <li>Confirm your DNS settings in Cloudflare</li>
-            <li>Verify CNAME points to <code>hostall-website.pages.dev</code></li>
+            <li>Verify CNAME points to <code>hostall.pages.dev</code></li>
             <li>Check if Proxy Status is enabled (orange cloud)</li>
           </ul>
         </div>
@@ -345,33 +371,19 @@ window.checkDNSPropagation = function() {
  * This function performs a complete cache flush and reload
  */
 window.forceHardRefresh = function() {
-  // Clear browser cache via cache API if available
-  if ('caches' in window) {
-    caches.keys().then(names => {
-      names.forEach(name => {
-        caches.delete(name);
-      });
-    });
-  }
-  
-  // Clear localStorage except crucial items
-  const preserveKeys = ['auth', 'supabase.auth.token', 'HOSTALL_VERSION'];
-  Object.keys(localStorage).forEach(key => {
-    if (!preserveKeys.includes(key)) {
-      localStorage.removeItem(key);
-    }
-  });
+  // Nuclear cache bust
+  nukeAllCaches();
   
   // Add a random query parameter to force reload
   const cacheBuster = Date.now();
-  window.location.href = window.location.href.split('?')[0] + '?refresh=' + cacheBuster;
+  window.location.href = window.location.href.split('?')[0] + '?nuclear=' + cacheBuster;
 };
 
-// Export utility functions
-window.HOSTALL_DOMAIN_FIX = {
+// Expose nuclear functionality globally
+window.HOSTALL_NUCLEAR = {
   version: HOSTALL_VERSION,
-  domain: DOMAIN_CONFIG.fullDomain,
-  checkDNSPropagation,
-  forceHardRefresh,
-  versionizeAssets
+  timestamp: Date.now(),
+  nukeCaches: nukeAllCaches,
+  forceRefresh: forceHardRefresh,
+  checkDNS: checkDNSPropagation
 };
