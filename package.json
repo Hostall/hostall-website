@@ -1,0 +1,33 @@
+{
+  "name": "hostall",
+  "version": "1.0.0",
+  "description": "HOSTALL - Hostel Management Platform",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step required for static site'",
+    "test": "echo 'No tests configured yet'",
+    "dev": "python -m http.server 8000 || php -S localhost:8000 || npx serve .",
+    "deploy": "echo 'Deployment handled by GitHub Actions'",
+    "backup": "node scripts/backup.js",
+    "lint": "echo 'Linting handled by GitHub Actions'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/hostall.git"
+  },
+  "keywords": [
+    "hostel",
+    "management",
+    "platform",
+    "supabase",
+    "cloudflare"
+  ],
+  "author": "HOSTALL Team",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
