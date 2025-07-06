@@ -28,8 +28,8 @@ serve(async (req) => {
 
   try {
     // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabaseUrl = Deno.env.get('https://pjnqhdhlcgrrmfzscswv.supabase.co')!
+    const supabaseKey = Deno.env.get('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqbnFoZGhsY2dycm1menNjc3d2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDk1ODc0MywiZXhwIjoyMDY2NTM0NzQzfQ.UOsI_DLymD6fSdH9DbNe7LH_oZG8uM1jPKFPv-N8Mhw')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     const { deployment_id, branch, timestamp }: DeploymentData = await req.json()
