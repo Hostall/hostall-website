@@ -4,40 +4,8 @@
 console.log('📱 Loading HOSTALL App...');
 
 // Global variables
-let supabaseClient = null;
 let hostelsData = [];
 let isLoading = false;
-
-// Initialize Supabase connection
-async function initializeSupabaseConnection() {
-  try {
-    console.log('🔌 Initializing Supabase connection...');
-    
-    if (typeof window.supabase === 'undefined') {
-      console.error('❌ Supabase library not loaded');
-      return false;
-    }
-
-    const supabaseUrl = 'https://pjnqhdhlcgrrmfzscswv.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqbnFoZGhsY2dycm1menNjc3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5NTg3NDMsImV4cCI6MjA2NjUzNDc0M30.UVaJXabJDPMSHgDzUk3tOEv9sAFSjqSRNEYroypqyGs';
-
-    supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-    
-    // Test connection
-    const { data, error } = await supabaseClient.from('hostels').select('count', { count: 'exact', head: true });
-    
-    if (error) {
-      console.error('❌ Supabase connection test failed:', error);
-      return false;
-    }
-    
-    console.log('✅ Supabase connected successfully');
-    return true;
-  } catch (error) {
-    console.error('❌ Supabase initialization error:', error);
-    return false;
-  }
-}
 
 // Load hostels from Supabase
 async function loadHostelsFromSupabase() {
@@ -53,15 +21,16 @@ async function loadHostelsFromSupabase() {
     // Show loading state
     showLoadingState();
     
+    const supabaseClient = window.getSupabaseClient();
     if (!supabaseClient) {
-      const connected = await initializeSupabaseConnection();
+      const connected = window.initializeSupabase();
       if (!connected) {
         throw new Error('Failed to connect to database');
       }
     }
 
-    // Fetch hostels from Supabase
-    const { data: hostels, error } = await supabaseClient
+    // Fetch hostels from Supabase  
+    const { data: hostels, error } = await window.getSupabaseClient()
       .from('hostels')
       .select('*')
       .order('created_at', { ascending: false });
@@ -293,6 +262,7 @@ function openWhatsApp() {
 
 // Real-time subscription setup
 function setupRealtimeSubscription() {
+  const supabaseClient = window.getSupabaseClient();
   if (!supabaseClient) {
     console.warn('⚠️ Supabase client not available for real-time subscription');
     return;
@@ -356,17 +326,15 @@ function filterHostels() {
 document.addEventListener('DOMContentLoaded', async function() {
   console.log('🚀 HOSTALL App initializing...');
   
+  // Initialize Supabase first
+  window.initializeSupabase();
+  
   // Setup search and filters
   setupSearchAndFilters();
   
-  // Initialize Supabase and load data
-  const connected = await initializeSupabaseConnection();
-  if (connected) {
-    await loadHostelsFromSupabase();
-    setupRealtimeSubscription();
-  } else {
-    showErrorMessage('Unable to connect to the database. Please check your internet connection.');
-  }
+  // Load data
+  await loadHostelsFromSupabase();
+  setupRealtimeSubscription();
   
   console.log('✅ HOSTALL App initialized');
 });

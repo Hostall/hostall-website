@@ -23,22 +23,7 @@ class App {
       }
 
       // Initialize Supabase
-      const supabaseInitialized = window.initializeSupabase();
-      if (!supabaseInitialized) {
-        console.warn(`⚠️ Supabase initialization failed (attempt ${this.initializationRetries}/${this.maxRetries})`);
-        
-        if (this.initializationRetries < this.maxRetries) {
-          setTimeout(() => {
-            console.log('🔄 Retrying application initialization...');
-            this.init();
-          }, 3000);
-          return;
-        } else {
-          console.error('❌ Max initialization retries reached');
-          this.showInitializationError();
-          return;
-        }
-      }
+      window.initializeSupabase();
 
       // Initialize managers
       await this.initializeManagers();
@@ -149,52 +134,7 @@ class App {
   // Setup navigation functionality
   setupNavigation() {
     // Show initial section
-    this.showSection(this.currentSection);
-    
-    // Setup mobile menu
-    window.toggleMobileMenu = () => {
-      const mobileMenu = document.querySelector('.mobile-menu');
-      if (mobileMenu) {
-        mobileMenu.classList.toggle('hidden');
-      }
-    };
-
-    // Setup section navigation
-    window.showSection = (sectionName) => {
-      // Hide all sections
-      document.querySelectorAll('.section').forEach(section => {
-        section.classList.add('hidden');
-      });
-
-      // Show target section
-      const targetSection = document.getElementById(sectionName);
-      if (targetSection) {
-        targetSection.classList.remove('hidden');
-        this.currentSection = sectionName;
-      }
-
-      // Update navigation links
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${sectionName}`) {
-          link.classList.add('active');
-        }
-      });
-
-      // Hide mobile menu after selection
-      const mobileMenu = document.querySelector('.mobile-menu');
-      if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-        mobileMenu.classList.add('hidden');
-      }
-    };
-
-    // Scroll to hostels function
-    window.scrollToHostels = () => {
-      const hostelsSection = document.getElementById('public-list');
-      if (hostelsSection) {
-        hostelsSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    };
+    window.showSection(this.currentSection);
   }
 
   // Setup event listeners
