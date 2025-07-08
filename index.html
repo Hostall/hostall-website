@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOSTALL - Best Hostels in Lahore | Boys & Girls Hostels | Affordable Accommodation | Live</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Find the best hostels in Lahore for boys and girls. HOSTALL offers verified, affordable student accommodation with modern facilities. Book your hostel room today!">
+    <meta name="keywords" content="hostels in Lahore, boys hostel, girls hostel, student accommodation, affordable hostels, Lahore hostels, hostel booking">
+    <meta name="author" content="HOSTALL Team">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="HOSTALL - Best Hostels in Lahore">
+    <meta property="og:description" content="Find verified, affordable hostels for students in Lahore. Modern facilities, safe environment, and great locations.">
+    <meta property="og:image" content="https://hostall.org/logo.png">
+    <meta property="og:url" content="https://hostall.org">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HOSTALL - Best Hostels in Lahore">
+    <meta name="twitter:description" content="Find verified, affordable hostels for students in Lahore.">
+    <meta name="twitter:image" content="https://hostall.org/logo.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- HugeIcons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hugeicons@1.0.0/icons.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .hostel-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .hostel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hostel-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .hostel-content {
+            padding: 1.5rem;
+        }
+        
+        .hostel-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hostel-location-only {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hostel-gender-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .hostel-gender-badge.male {
+            background-color: #3b82f6;
+        }
+        
+        .hostel-gender-badge.female {
+            background-color: #ec4899;
+        }
+        
+        .hostel-gender-badge.any {
+            background-color: #6b7280;
+        }
+        
+        .hostel-image-container {
+            position: relative;
+        }
+        
+        .view-details-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .view-details-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f4f6;
+            border-radius: 50%;
+            border-top-color: #8b5cf6;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            color: #8b5cf6;
+        }
+        
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .success-message {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <img src="logo.png" alt="HOSTALL Logo" class="h-10 w-auto">
+                    <span class="ml-2 text-xl font-bold text-gray-900">HOSTALL</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('home')">Home</a>
+                    <a href="#hostels" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('hostels')">Hostels</a>
+                    <a href="#about" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('about')">About</a>
+                    <a href="#contact" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('contact')">Contact</a>
+                    <a href="#admin" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('admin')">Admin</a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-gray-700 hover:text-purple-600">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div class="mobile-menu hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#home" class="block px-3 py-2 text-gray-700" onclick="showSection('home')">Home</a>
+                <a href="#hostels" class="block px-3 py-2 text-gray-700" onclick="showSection('hostels')">Hostels</a>
+                <a href="#about" class="block px-3 py-2 text-gray-700" onclick="showSection('about')">About</a>
+                <a href="#contact" class="block px-3 py-2 text-gray-700" onclick="showSection('contact')">Contact</a>
+                <a href="#admin" class="block px-3 py-2 text-gray-700" onclick="showSection('admin')">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Hero Section -->
+            <div class="text-center py-20">
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+                    Find Your Perfect <span class="text-purple-600">Hostel</span> in Lahore
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                    Discover verified, affordable, and comfortable hostels for students. Safe accommodation with modern facilities in the best locations of Lahore.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="scrollToHostels()" class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                        Browse Hostels
+                    </button>
+                    <button onclick="openWhatsApp()" class="bg-green-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                        WhatsApp Chat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="grid md:grid-cols-3 gap-8 py-16">
+                <div class="text-center">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="hgi-stroke hgi-shield-security text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Verified & Safe</h3>
+                    <p class="text-gray-600">All hostels are personally verified for safety and quality standards.</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="hgi-stroke hgi-money-bag-02 text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Affordable Rates</h3>
+                    <p class="text-gray-600">Budget-friendly options without compromising on quality and comfort.</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="hgi-stroke hgi-location-01 text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Prime Locations</h3>
+                    <p class="text-gray-600">Conveniently located near universities and major transport hubs.</p>
+                </div>
+            </div>
+
+            <!-- Live Hostels Section -->
+            <div class="py-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Available Hostels</h2>
+                    <p class="text-gray-600">Browse our verified hostel listings updated in real-time</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-hostels" class="text-center py-12">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-gray-600">Loading hostels from database...</p>
+                </div>
+
+                <!-- Hostels Grid -->
+                <div id="public-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Hostels will be loaded here dynamically -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hostels Section -->
+    <section id="hostels" class="section hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+            <h2 class="text-3xl font-bold text-center mb-8">All Hostels</h2>
+            
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-4 mb-8 justify-center">
+                <select id="gender-filter" class="px-4 py-2 border rounded-lg">
+                    <option value="all">All Genders</option>
+                    <option value="Male">Male Only</option>
+                    <option value="Female">Female Only</option>
+                </select>
+                <input type="text" id="search-input" placeholder="Search hostels..." class="px-4 py-2 border rounded-lg">
+            </div>
+            
+            <!-- Hostels Grid -->
+            <div id="hostels-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Hostels will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+            <h2 class="text-3xl font-bold text-center mb-8">About HOSTALL</h2>
+            <div class="prose prose-lg mx-auto">
+                <p class="text-gray-600 text-lg leading-relaxed mb-6">
+                    HOSTALL is Pakistan's premier hostel listing platform, dedicated to helping students find safe, affordable, and comfortable accommodations in Lahore. We bridge the gap between students and quality hostels, making the search for the perfect home away from home easier than ever.
+                </p>
+                <p class="text-gray-600 text-lg leading-relaxed mb-6">
+                    Our mission is to revolutionize the student accommodation experience by providing a comprehensive, trustworthy platform that connects students with verified, quality hostels. We strive to make the transition to independent living smooth, safe, and affordable for every student.
+                </p>
+                <div class="grid md:grid-cols-2 gap-8 mt-12">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-purple-600 mb-2">150+</div>
+                        <div class="text-gray-600">Verified Hostels</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-purple-600 mb-2">5000+</div>
+                        <div class="text-gray-600">Happy Students</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+            <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Get in Touch</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <i class="hgi-stroke hgi-mail-01 text-purple-600 mr-3"></i>
+                            <span>teamhostall@gmail.com</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="hgi-stroke hgi-call text-purple-600 mr-3"></i>
+                            <span>+92-333-1536041</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="hgi-stroke hgi-location-01 text-purple-600 mr-3"></i>
+                            <span>Lahore, Punjab, Pakistan</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Quick Contact</h3>
+                    <button onclick="openWhatsApp()" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                        Chat on WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Section -->
+    <section id="admin" class="section hidden">
+        <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+            <!-- Admin Login -->
+            <div id="admin-login" class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
+                <form id="admin-login-form">
+                    <div class="mb-4">
+                        <label for="admin-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="admin-email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                    <div class="mb-6">
+                        <label for="admin-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="admin-password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                    <button type="submit" class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                        Login
+                    </button>
+                </form>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div id="admin-dashboard" class="hidden bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-center mb-6">Admin Dashboard</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold">Total Hostels</h3>
+                        <p class="text-2xl font-bold text-purple-600" id="total-hostels">0</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold">Active Listings</h3>
+                        <p class="text-2xl font-bold text-green-600" id="active-listings">0</p>
+                    </div>
+                    <button onclick="window.adminManager.logout()" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WhatsApp Chat Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button onclick="openWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="hostel-manager.js"></script>
+    <script src="admin-manager.js"></script>
+    <script src="main.js"></script>
+    <script src="app.js"></script>
+
+    <!-- Initialize App -->
+    <script>
+        // Initialize the application when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM loaded, initializing HOSTALL...');
+            
+            // Wait a bit for all scripts to load
+            setTimeout(() => {
+                if (window.app) {
+                    window.app.init();
+                } else {
+                    console.warn('⚠️ App not found, retrying...');
+                    setTimeout(() => {
+                        if (window.app) {
+                            window.app.init();
+                        }
+                    }, 1000);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>
