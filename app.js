@@ -343,6 +343,120 @@ document.addEventListener('DOMContentLoaded', async function() {
 window.showSection = showSection;
 window.toggleMobileMenu = toggleMobileMenu;
 window.scrollToHostels = scrollToHostels;
-window.openWhatsApp = openWhatsApp;
+window.openWhatsApp = openWhatsAppDirect;
+window.openWhatsAppDirect = openWhatsAppDirect;
+window.openChatModal = openChatModal;
+window.closeChatModal = closeChatModal;
+window.submitChatMessage = submitChatMessage;
 window.showHostelDetails = showHostelDetails;
 window.loadHostelsFromSupabase = loadHostelsFromSupabase;
+window.toggleFAQ = toggleFAQ;
+window.showAdminTab = showAdminTab;
+window.showAddHostelForm = showAddHostelForm;
+window.replyViaWhatsApp = replyViaWhatsApp;
+window.replyViaEmail = replyViaEmail;
+window.markAsResolved = markAsResolved;
+
+// FAQ functionality
+function toggleFAQ(element) {
+  const answer = element.nextElementSibling;
+  const icon = element.querySelector('i');
+  
+  answer.classList.toggle('hidden');
+  icon.classList.toggle('rotate-180');
+}
+
+// Admin tab functionality
+function showAdminTab(tabName) {
+  // Hide all tab contents
+  document.querySelectorAll('.admin-tab-content').forEach(content => {
+    content.classList.add('hidden');
+  });
+  
+  // Remove active class from all tabs
+  document.querySelectorAll('.admin-tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.classList.add('border-transparent', 'text-gray-500');
+    tab.classList.remove('border-purple-500', 'text-purple-600');
+  });
+  
+  // Show selected tab content
+  document.getElementById(`admin-${tabName}-tab`).classList.remove('hidden');
+  
+  // Add active class to selected tab
+  event.target.classList.add('active', 'border-purple-500', 'text-purple-600');
+  event.target.classList.remove('border-transparent', 'text-gray-500');
+}
+
+// Chat modal functionality
+function openChatModal() {
+  document.getElementById('chat-modal').classList.remove('hidden');
+}
+
+function closeChatModal() {
+  document.getElementById('chat-modal').classList.add('hidden');
+  document.getElementById('chat-form').reset();
+}
+
+// Submit chat message
+async function submitChatMessage(event) {
+  event.preventDefault();
+  
+  const name = document.getElementById('chat-name').value;
+  const phone = document.getElementById('chat-phone').value;
+  const message = document.getElementById('chat-message').value;
+  
+  try {
+    // Save message to Supabase
+    const client = window.getSupabaseClient();
+    if (client) {
+      await client.from('messages').insert({
+        name: name,
+        phone: phone,
+        message: message,
+        created_at: new Date().toISOString()
+      });
+    }
+    
+    alert('Message sent successfully! We will contact you soon.');
+    closeChatModal();
+  } catch (error) {
+    console.error('Error sending message:', error);
+    alert('Failed to send message. Please try WhatsApp instead.');
+  }
+}
+
+// Direct WhatsApp function
+function openWhatsAppDirect() {
+  const phoneNumber = '+923331536041';
+  const message = 'Hi! I found your hostels on HOSTALL. I would like to know more about available rooms.';
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+}
+
+// Admin functions
+function showAddHostelForm() {
+  alert('Add hostel form will be implemented here');
+}
+
+function replyViaWhatsApp(phone) {
+  const message = 'Hi! Thank you for your inquiry about our hostels. How can we help you?';
+  const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+}
+
+function replyViaEmail(email) {
+  const subject = 'Reply from HOSTALL - Hostel Inquiry';
+  const body = 'Hi!\n\nThank you for your inquiry about our hostels. We would be happy to help you find the perfect accommodation.\n\nBest regards,\nHOSTALL Team';
+  const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(mailtoUrl, '_blank');
+}
+
+function markAsResolved(button) {
+  const messageDiv = button.closest('.border');
+  messageDiv.style.opacity = '0.5';
+  button.textContent = 'Resolved';
+  button.disabled = true;
+  button.classList.remove('hover:bg-gray-600');
+  button.classList.add('cursor-not-allowed');
+}
