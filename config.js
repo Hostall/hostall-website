@@ -1,5 +1,5 @@
 // HOSTALL Configuration
-// Secure configuration for Supabase connection
+// Enhanced configuration with error handling
 const CONFIG = {
   supabase: {
     url: 'https://pjnqhdhlcgrrmfzscswv.supabase.co',
@@ -8,28 +8,65 @@ const CONFIG = {
   app: {
     name: 'HOSTALL',
     version: '2.0',
-    debug: false
+    debug: true,
+    retryAttempts: 3,
+    retryDelay: 2000
   }
 };
 
 // Initialize Supabase when config is loaded
 let supabaseClient = null;
+let initializationAttempts = 0;
 
 function initializeSupabase() {
-  if (typeof supabase !== 'undefined' && CONFIG.supabase.url && CONFIG.supabase.key) {
+  const maxAttempts = CONFIG.app.retryAttempts;
+  
+  if (initializationAttempts >= maxAttempts) {
+    console.error('❌ Max Supabase initialization attempts reached');
+    return false;
+  }
+  
+  initializationAttempts++;
+  
+  if (typeof window.supabase !== 'undefined' && CONFIG.supabase.url && CONFIG.supabase.key) {
     try {
-      supabaseClient = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.key);
-      console.log('✅ Supabase initialized successfully');
+      supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.key);
+      console.log(`✅ Supabase initialized successfully (attempt ${initializationAttempts})`);
+      initializationAttempts = 0; // Reset on success
       return true;
     } catch (error) {
-      console.error('❌ Supabase initialization failed:', error);
+      console.error(`❌ Supabase initialization failed (attempt ${initializationAttempts}):`, error);
+      
+      // Retry after delay if not max attempts
+      if (initializationAttempts < maxAttempts) {
+        setTimeout(() => {
+          console.log(`⏳ Retrying Supabase initialization in ${CONFIG.app.retryDelay}ms...`);
+          initializeSupabase();
+        }, CONFIG.app.retryDelay);
+      }
       return false;
+    }
+  } else {
+    console.warn(`⚠️ Supabase dependencies not ready (attempt ${initializationAttempts})`);
+    
+    // Retry after delay if not max attempts
+    if (initializationAttempts < maxAttempts) {
+      setTimeout(() => {
+        initializeSupabase();
+      }, CONFIG.app.retryDelay);
     }
   }
   return false;
 }
 
+// Enhanced getter with validation
+window.getSupabaseClient = () => {
+  if (!supabaseClient) {
+    console.warn('⚠️ Supabase client not initialized, attempting initialization...');
+    initializeSupabase();
+  }
+  return supabaseClient;
+};
 // Export for use in other modules
 window.CONFIG = CONFIG;
 window.initializeSupabase = initializeSupabase;
-window.getSupabaseClient = () => supabaseClient;

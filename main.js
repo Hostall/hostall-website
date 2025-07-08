@@ -1,10 +1,12 @@
 // HOSTALL Main Application Controller
-// This file handles app initialization and basic functionality
+// Enhanced with comprehensive error handling and retry mechanisms
 
 class App {
   constructor() {
     this.currentSection = 'home';
     this.isInitialized = false;
+    this.initializationRetries = 0;
+    this.maxRetries = 3;
   }
 
   // Initialize the application
@@ -12,15 +14,30 @@ class App {
     try {
       console.log('🚀 Initializing HOSTALL...');
       
+      // Increment retry counter
+      this.initializationRetries++;
+      
       // Wait for DOM to be ready
       if (document.readyState === 'loading') {
         await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve));
       }
 
       // Initialize Supabase
-      if (!window.initializeSupabase()) {
-        console.warn('⚠️ Supabase initialization failed, retrying...');
-        setTimeout(() => window.initializeSupabase(), 2000);
+      const supabaseInitialized = window.initializeSupabase();
+      if (!supabaseInitialized) {
+        console.warn(`⚠️ Supabase initialization failed (attempt ${this.initializationRetries}/${this.maxRetries})`);
+        
+        if (this.initializationRetries < this.maxRetries) {
+          setTimeout(() => {
+            console.log('🔄 Retrying application initialization...');
+            this.init();
+          }, 3000);
+          return;
+        } else {
+          console.error('❌ Max initialization retries reached');
+          this.showInitializationError();
+          return;
+        }
       }
 
       // Initialize managers
@@ -37,11 +54,56 @@ class App {
 
       this.isInitialized = true;
       console.log('✅ HOSTALL initialized successfully');
+      this.initializationRetries = 0; // Reset on success
     } catch (error) {
       console.error('❌ App initialization failed:', error);
+      
+      if (this.initializationRetries < this.maxRetries) {
+        setTimeout(() => {
+          console.log('🔄 Retrying application initialization...');
+          this.init();
+        }, 3000);
+      } else {
+        this.showInitializationError();
+      }
     }
   }
 
+  // Show initialization error to user
+  showInitializationError() {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'initialization-error';
+    errorDiv.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      color: white;
+      font-family: Inter, sans-serif;
+    `;
+    
+    errorDiv.innerHTML = `
+      <div style="text-align: center; padding: 2rem; background: #1f2937; border-radius: 12px; max-width: 400px;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+        <h2 style="margin-bottom: 1rem; color: #f59e0b;">Initialization Failed</h2>
+        <p style="margin-bottom: 1.5rem; color: #d1d5db;">
+          Unable to connect to the database. Please check your internet connection and try again.
+        </p>
+        <button onclick="window.location.reload()" 
+                style="background: #8b5cf6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 500;">
+          Retry
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(errorDiv);
+  }
   // Initialize all managers
   async initializeManagers() {
     try {
@@ -52,15 +114,31 @@ class App {
       while ((!window.hostelManager || !window.adminManager) && retries < maxRetries) {
         await new Promise(resolve => setTimeout(resolve, 100));
         retries++;
+        
+        if (retries === Math.floor(maxRetries / 2)) {
+          console.log('⏳ Still waiting for managers to load...');
+        }
+      }
+
+      if (retries >= maxRetries) {
+        console.warn('⚠️ Managers took longer than expected to load');
       }
 
       if (window.hostelManager) {
-        await window.hostelManager.init();
+        try {
+          await window.hostelManager.init();
+        } catch (error) {
+          console.error('❌ Hostel manager initialization failed:', error);
+        }
         console.log('✅ Hostel manager initialized');
       }
 
       if (window.adminManager) {
-        window.adminManager.init();
+        try {
+          window.adminManager.init();
+        } catch (error) {
+          console.error('❌ Admin manager initialization failed:', error);
+        }
         console.log('✅ Admin manager initialized');
       }
     } catch (error) {
@@ -157,16 +235,30 @@ class App {
   async handleAdminLogin(event) {
     event.preventDefault();
     
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    
+    // Show loading state
+    submitButton.textContent = 'Logging in...';
+    submitButton.disabled = true;
+    
     const email = document.getElementById('admin-email').value;
     const password = document.getElementById('admin-password').value;
 
     if (!email || !password) {
       alert('Please enter both email and password');
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
       return;
     }
 
     try {
-      const result = await window.adminManager.login(email, password);
+      let result;
+      if (window.adminManager && typeof window.adminManager.login === 'function') {
+        result = await window.adminManager.login(email, password);
+      } else {
+        throw new Error('Admin manager not available');
+      }
       
       if (result.success) {
         // Hide login form and show dashboard
@@ -180,7 +272,11 @@ class App {
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('Login failed. Please try again.');
+      alert('Login failed: ' + (error.message || 'Please try again.'));
+    } finally {
+      // Restore button state
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
     }
   }
 
