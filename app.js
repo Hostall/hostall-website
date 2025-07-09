@@ -137,9 +137,18 @@ async function openHostelDetailsPage(hostelId) {
       throw new Error('Hostel not found');
     }
 
+    // Get hostel reviews
+    const { data: reviews, error: reviewsError } = await client
+      .from('hostel_reviews')
+      .select('*')
+      .eq('hostel_id', hostelId)
+      .order('created_at', { ascending: false });
     // Create hostel details page content
-    const detailsContent = createHostelDetailsContent(hostel);
+    const detailsContent = createHostelDetailsContent(hostel, reviews || []);
     document.getElementById('hostel-details-content').innerHTML = detailsContent;
+    
+    // Initialize carousel and other interactive elements
+    initializeHostelDetailsPage(hostel);
     
     // Show hostel details page
     showSection('hostel-details');
@@ -150,17 +159,85 @@ async function openHostelDetailsPage(hostelId) {
 }
 
 // Create hostel details page content
-function createHostelDetailsContent(hostel) {
+function createHostelDetailsContent(hostel, reviews = []) {
   const facilities = hostel.facilities ? 
     (Array.isArray(hostel.facilities) ? hostel.facilities.join(', ') : hostel.facilities) : 
     'Not specified';
 
-  const imageUrl = hostel.img || getPlaceholderImage(hostel);
+  // Prepare media gallery (images and videos)
+  const mediaItems = [];
+  
+  // Add main image
+  if (hostel.img) {
+    mediaItems.push({ type: 'image', url: hostel.img, caption: 'Main View' });
+  }
+  
+  // Add gallery images if available
+  if (hostel.gallery_images && Array.isArray(hostel.gallery_images)) {
+    hostel.gallery_images.forEach((img, index) => {
+      mediaItems.push({ type: 'image', url: img, caption: `Gallery Image ${index + 1}` });
+    });
+  }
+  
+  // Add videos if available
+  if (hostel.videos && Array.isArray(hostel.videos)) {
+    hostel.videos.forEach((video, index) => {
+      mediaItems.push({ type: 'video', url: video, caption: `Video Tour ${index + 1}` });
+    });
+  }
+  
+  // If no media, add placeholder
+  if (mediaItems.length === 0) {
+    mediaItems.push({ type: 'image', url: getPlaceholderImage(hostel), caption: 'Hostel Image' });
+  }
+  
+  // Calculate average rating
+  const avgRating = reviews.length > 0 ? 
+    (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1) : 0;
   
   return `
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+      <!-- Media Carousel -->
       <div class="relative">
-        <img src="${imageUrl}" alt="${hostel.name}" class="w-full h-64 object-cover">
+        <div id="media-carousel" class="relative h-96 overflow-hidden">
+          ${mediaItems.map((item, index) => `
+            <div class="carousel-item ${index === 0 ? 'active' : ''}" data-index="${index}">
+              ${item.type === 'image' ? 
+                `<img src="${item.url}" alt="${item.caption}" class="w-full h-96 object-cover">` :
+                `<video controls class="w-full h-96 object-cover">
+                   <source src="${item.url}" type="video/mp4">
+                   Your browser does not support the video tag.
+                 </video>`
+              }
+              <div class="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded">
+                ${item.caption}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <!-- Carousel Controls -->
+        ${mediaItems.length > 1 ? `
+          <button id="prev-btn" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+          <button id="next-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          
+          <!-- Carousel Indicators -->
+          <div class="absolute bottom-4 right-4 flex space-x-2">
+            ${mediaItems.map((_, index) => `
+              <button class="carousel-indicator w-3 h-3 rounded-full ${index === 0 ? 'bg-white' : 'bg-white bg-opacity-50'}" data-index="${index}"></button>
+            `).join('')}
+          </div>
+        ` : ''}
+        
+        <!-- Gender Badge -->
         <div class="absolute top-4 right-4">
           <span class="px-3 py-1 rounded-full text-sm font-medium text-white ${hostel.gender === 'Male' ? 'bg-blue-500' : hostel.gender === 'Female' ? 'bg-pink-500' : 'bg-gray-500'}">
             ${hostel.gender || 'Any'} Only
@@ -169,9 +246,25 @@ function createHostelDetailsContent(hostel) {
       </div>
       
       <div class="p-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-4">${hostel.name || 'Unnamed Hostel'}</h1>
+        <!-- Header with Rating -->
+        <div class="flex justify-between items-start mb-4">
+          <h1 class="text-3xl font-bold text-gray-900">${hostel.name || 'Unnamed Hostel'}</h1>
+          <div class="text-right">
+            <div class="flex items-center">
+              <div class="flex text-yellow-400">
+                ${[1,2,3,4,5].map(star => `
+                  <svg class="w-5 h-5 ${star <= avgRating ? 'fill-current' : 'text-gray-300'}" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                `).join('')}
+              </div>
+              <span class="ml-2 text-gray-600">${avgRating}/5 (${reviews.length} reviews)</span>
+            </div>
+          </div>
+        </div>
         
-        <div class="grid md:grid-cols-2 gap-6">
+        <!-- Hostel Information Grid -->
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
           <div>
             <h3 class="text-lg font-semibold mb-3">Basic Information</h3>
             <div class="space-y-2">
@@ -191,22 +284,52 @@ function createHostelDetailsContent(hostel) {
                 <span class="w-6 h-6 mr-3">👥</span>
                 <span>${hostel.gender || 'Any'} Gender</span>
               </div>
+              ${hostel.rent ? `
+                <div class="flex items-center">
+                  <span class="w-6 h-6 mr-3">💰</span>
+                  <span>PKR ${hostel.rent}/month</span>
+                </div>
+              ` : ''}
             </div>
           </div>
           
           <div>
             <h3 class="text-lg font-semibold mb-3">Facilities</h3>
             <p class="text-gray-600">${facilities}</p>
+            ${hostel.other_facilities ? `
+              <div class="mt-3">
+                <h4 class="font-medium text-gray-700">Additional Facilities:</h4>
+                <p class="text-gray-600">${hostel.other_facilities}</p>
+              </div>
+            ` : ''}
           </div>
         </div>
         
-        <div class="mt-6">
+        <!-- Description -->
+        <div class="mb-6">
           <h3 class="text-lg font-semibold mb-3">Additional Information</h3>
           <p class="text-gray-600">${hostel.details || 'No additional details available'}</p>
         </div>
         
+        <!-- Important Note -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-yellow-700">
+                <strong>Note:</strong> This hostel information is based on in-person or phone-based data collection by the HOSTALL team. Facilities and prices may change. Please verify with the hostel before making any decisions.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Map Section -->
         ${hostel.map ? `
-          <div class="mt-6">
+          <div class="mb-6">
             <h3 class="text-lg font-semibold mb-3">Location Map</h3>
             <a href="${hostel.map}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
               <span class="mr-2">🗺️</span>
@@ -215,7 +338,8 @@ function createHostelDetailsContent(hostel) {
           </div>
         ` : ''}
         
-        <div class="mt-8 flex flex-wrap gap-4">
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-4 mb-8">
           <button onclick="callHostel('${hostel.phone}')" class="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-colors">
             📞 Call Now
           </button>
@@ -225,9 +349,313 @@ function createHostelDetailsContent(hostel) {
         </div>
       </div>
     </div>
+    
+    <!-- Reviews Section -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Reviews & Ratings</h2>
+        <button onclick="openReviewModal(${hostel.id})" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+          Write a Review
+        </button>
+      </div>
+      
+      ${reviews.length > 0 ? `
+        <div class="space-y-4">
+          ${reviews.slice(0, 5).map(review => `
+            <div class="border-b border-gray-200 pb-4">
+              <div class="flex justify-between items-start mb-2">
+                <div>
+                  <h4 class="font-semibold text-gray-900">${review.reviewer_name}</h4>
+                  <div class="flex items-center">
+                    <div class="flex text-yellow-400">
+                      ${[1,2,3,4,5].map(star => `
+                        <svg class="w-4 h-4 ${star <= review.rating ? 'fill-current' : 'text-gray-300'}" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      `).join('')}
+                    </div>
+                    <span class="ml-2 text-sm text-gray-600">${review.rating}/5</span>
+                  </div>
+                </div>
+                <span class="text-sm text-gray-500">${new Date(review.created_at).toLocaleDateString()}</span>
+              </div>
+              <p class="text-gray-700">${review.review_text}</p>
+            </div>
+          `).join('')}
+          
+          ${reviews.length > 5 ? `
+            <button onclick="loadMoreReviews(${hostel.id})" class="text-purple-600 hover:text-purple-700 font-medium">
+              View all ${reviews.length} reviews
+            </button>
+          ` : ''}
+        </div>
+      ` : `
+        <div class="text-center py-8 text-gray-500">
+          <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          <p class="text-lg font-medium mb-2">No reviews yet</p>
+          <p>Be the first to review this hostel!</p>
+        </div>
+      `}
+    </div>
   `;
 }
 
+// Initialize hostel details page interactive elements
+function initializeHostelDetailsPage(hostel) {
+  // Initialize carousel
+  initializeCarousel();
+  
+  // Set up any other interactive elements
+  console.log('Hostel details page initialized for:', hostel.name);
+}
+
+// Initialize media carousel
+function initializeCarousel() {
+  const carousel = document.getElementById('media-carousel');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const indicators = document.querySelectorAll('.carousel-indicator');
+  const items = document.querySelectorAll('.carousel-item');
+  
+  if (!carousel || items.length <= 1) return;
+  
+  let currentIndex = 0;
+  
+  function showSlide(index) {
+    // Hide all items
+    items.forEach(item => item.classList.remove('active'));
+    indicators.forEach(indicator => indicator.classList.remove('bg-white'));
+    indicators.forEach(indicator => indicator.classList.add('bg-white', 'bg-opacity-50'));
+    
+    // Show current item
+    items[index].classList.add('active');
+    if (indicators[index]) {
+      indicators[index].classList.remove('bg-opacity-50');
+      indicators[index].classList.add('bg-white');
+    }
+    
+    currentIndex = index;
+  }
+  
+  function nextSlide() {
+    const nextIndex = (currentIndex + 1) % items.length;
+    showSlide(nextIndex);
+  }
+  
+  function prevSlide() {
+    const prevIndex = (currentIndex - 1 + items.length) % items.length;
+    showSlide(prevIndex);
+  }
+  
+  // Event listeners
+  if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+  if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+  
+  indicators.forEach((indicator, index) => {
+    indicator.addEventListener('click', () => showSlide(index));
+  });
+  
+  // Auto-play (optional)
+  setInterval(nextSlide, 5000);
+}
+
+// Open review modal
+function openReviewModal(hostelId) {
+  const modal = document.createElement('div');
+  modal.id = 'review-modal';
+  modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+  
+  modal.innerHTML = `
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="flex items-center justify-between p-4 border-b">
+        <h3 class="text-lg font-semibold">Write a Review</h3>
+        <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="p-6">
+        <form id="review-form" onsubmit="submitReview(event, ${hostelId})">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+            <input type="text" id="reviewer-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+            <div class="flex space-x-1" id="rating-stars">
+              ${[1,2,3,4,5].map(star => `
+                <button type="button" class="rating-star text-gray-300 hover:text-yellow-400 focus:text-yellow-400" data-rating="${star}">
+                  <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                </button>
+              `).join('')}
+            </div>
+            <input type="hidden" id="rating-value" required>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+            <textarea id="review-text" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Share your experience with this hostel..."></textarea>
+          </div>
+          
+          <div class="flex gap-3">
+            <button type="button" onclick="closeReviewModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" class="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+              Submit Review
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Initialize rating stars
+  const ratingStars = document.querySelectorAll('.rating-star');
+  const ratingValue = document.getElementById('rating-value');
+  
+  ratingStars.forEach(star => {
+    star.addEventListener('click', function() {
+      const rating = parseInt(this.dataset.rating);
+      ratingValue.value = rating;
+      
+      ratingStars.forEach((s, index) => {
+        if (index < rating) {
+          s.classList.remove('text-gray-300');
+          s.classList.add('text-yellow-400');
+        } else {
+          s.classList.remove('text-yellow-400');
+          s.classList.add('text-gray-300');
+        }
+      });
+    });
+  });
+}
+
+// Close review modal
+function closeReviewModal() {
+  const modal = document.getElementById('review-modal');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+// Submit review
+async function submitReview(event, hostelId) {
+  event.preventDefault();
+  
+  const reviewerName = document.getElementById('reviewer-name').value;
+  const rating = parseInt(document.getElementById('rating-value').value);
+  const reviewText = document.getElementById('review-text').value;
+  
+  if (!rating) {
+    alert('Please select a rating');
+    return;
+  }
+  
+  try {
+    const client = window.getSupabaseClient();
+    if (!client) {
+      throw new Error('Database connection not available');
+    }
+    
+    const { error } = await client
+      .from('hostel_reviews')
+      .insert({
+        hostel_id: hostelId,
+        reviewer_name: reviewerName,
+        rating: rating,
+        review_text: reviewText,
+        created_at: new Date().toISOString()
+      });
+    
+    if (error) {
+      throw error;
+    }
+    
+    alert('Review submitted successfully!');
+    closeReviewModal();
+    
+    // Refresh the page to show new review
+    openHostelDetailsPage(hostelId);
+    
+  } catch (error) {
+    console.error('Error submitting review:', error);
+    alert('Failed to submit review. Please try again.');
+  }
+}
+
+// Load more reviews
+async function loadMoreReviews(hostelId) {
+  try {
+    const client = window.getSupabaseClient();
+    if (!client) return;
+    
+    const { data: reviews, error } = await client
+      .from('hostel_reviews')
+      .select('*')
+      .eq('hostel_id', hostelId)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error loading reviews:', error);
+      return;
+    }
+    
+    // Create modal to show all reviews
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+    
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+        <div class="flex items-center justify-between p-4 border-b">
+          <h3 class="text-lg font-semibold">All Reviews (${reviews.length})</h3>
+          <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          ${reviews.map(review => `
+            <div class="border-b border-gray-200 pb-4">
+              <div class="flex justify-between items-start mb-2">
+                <div>
+                  <h4 class="font-semibold text-gray-900">${review.reviewer_name}</h4>
+                  <div class="flex items-center">
+                    <div class="flex text-yellow-400">
+                      ${[1,2,3,4,5].map(star => `
+                        <svg class="w-4 h-4 ${star <= review.rating ? 'fill-current' : 'text-gray-300'}" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      `).join('')}
+                    </div>
+                    <span class="ml-2 text-sm text-gray-600">${review.rating}/5</span>
+                  </div>
+                </div>
+                <span class="text-sm text-gray-500">${new Date(review.created_at).toLocaleDateString()}</span>
+              </div>
+              <p class="text-gray-700">${review.review_text}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+  } catch (error) {
+    console.error('Error loading more reviews:', error);
+  }
+}
 // Call hostel function
 function callHostel(phoneNumber) {
   if (phoneNumber && phoneNumber !== 'Phone not provided') {
