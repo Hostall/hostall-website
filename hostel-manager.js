@@ -7,6 +7,7 @@ class HostelManager {
     this.filters = {
       gender: 'all',
       location: 'all',
+      budget: 'all',
       facilities: []
     };
   }
@@ -224,6 +225,25 @@ ${hostel.map ? '🗺️ View on map: ' + hostel.map : '❌ Map not provided'}`;
       // Location filter (implement as needed)
       if (this.filters.location !== 'all' && !hostel.location?.toLowerCase().includes(this.filters.location.toLowerCase())) {
         return false;
+      }
+      
+      // Budget filter
+      if (this.filters.budget !== 'all') {
+        const rent = parseInt(hostel.rent) || 0;
+        switch (this.filters.budget) {
+          case '5000-10000':
+            if (rent < 5000 || rent > 10000) return false;
+            break;
+          case '10000-15000':
+            if (rent < 10000 || rent > 15000) return false;
+            break;
+          case '15000-20000':
+            if (rent < 15000 || rent > 20000) return false;
+            break;
+          case '20000+':
+            if (rent < 20000) return false;
+            break;
+        }
       }
       
       // Facilities filter (implement as needed)

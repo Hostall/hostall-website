@@ -149,6 +149,7 @@ class App {
     const searchInput = document.getElementById('search-input');
     const genderFilter = document.getElementById('gender-filter');
     const locationFilter = document.getElementById('location-filter');
+    const budgetFilter = document.getElementById('budget-filter');
 
     if (searchInput) {
       searchInput.addEventListener('input', this.handleSearch.bind(this));
@@ -162,6 +163,9 @@ class App {
       locationFilter.addEventListener('change', this.handleFilterChange.bind(this));
     }
 
+    if (budgetFilter) {
+      budgetFilter.addEventListener('change', this.handleFilterChange.bind(this));
+    }
     // WhatsApp chat
     window.openWhatsApp = () => {
       const phoneNumber = '+923001234567';
@@ -207,6 +211,11 @@ class App {
         
         // Update dashboard data
         this.updateDashboardStats();
+        
+        // Load admin messages
+        if (typeof loadAdminMessages === 'function') {
+          loadAdminMessages();
+        }
       } else {
         alert('Login failed: ' + result.error);
       }
@@ -240,12 +249,14 @@ class App {
   // Handle filter changes
   handleFilterChange() {
     const genderFilter = document.getElementById('gender-filter').value;
-    const locationFilter = document.getElementById('location-filter').value;
+    const locationFilter = document.getElementById('location-filter')?.value || 'all';
+    const budgetFilter = document.getElementById('budget-filter')?.value || 'all';
 
     if (window.hostelManager) {
       // Update filters
       window.hostelManager.filters.gender = genderFilter;
       window.hostelManager.filters.location = locationFilter;
+      window.hostelManager.filters.budget = budgetFilter;
       
       // Re-render hostels
       window.hostelManager.renderHostelCards();
