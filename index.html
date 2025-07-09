@@ -29,6 +29,18 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID" crossorigin="anonymous"></script>
+    
     <!-- Supabase -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
@@ -185,6 +197,87 @@
         .faq-answer.hidden {
           display: none;
         }
+
+        .filter-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .hostel-details-page {
+            min-height: 100vh;
+            background: #f9fafb;
+            padding-top: 80px;
+        }
+
+        .back-button {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            background: #4b5563;
+        }
+
+        .message-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .whatsapp-btn {
+            background: #25d366;
+            color: white;
+        }
+
+        .email-btn {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .resolve-btn {
+            background: #6b7280;
+            color: white;
+        }
+
+        .assign-btn {
+            background: #8b5cf6;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -200,10 +293,8 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="#home" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('home')">Home</a>
-                    <a href="#hostels" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('hostels')">Hostels</a>
-                    <a href="#about" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('about')">About</a>
+                    <a href="#about" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('about')">About Us</a>
                     <a href="#faq" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('faq')">FAQ</a>
-                    <a href="#contact" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('contact')">Contact</a>
                     <a href="#admin" class="nav-link text-gray-700 hover:text-purple-600 font-medium" onclick="showSection('admin')">Admin</a>
                 </div>
                 
@@ -222,10 +313,8 @@
         <div class="mobile-menu hidden md:hidden bg-white border-t">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="#home" class="block px-3 py-2 text-gray-700" onclick="showSection('home')">Home</a>
-                <a href="#hostels" class="block px-3 py-2 text-gray-700" onclick="showSection('hostels')">Hostels</a>
-                <a href="#about" class="block px-3 py-2 text-gray-700" onclick="showSection('about')">About</a>
+                <a href="#about" class="block px-3 py-2 text-gray-700" onclick="showSection('about')">About Us</a>
                 <a href="#faq" class="block px-3 py-2 text-gray-700" onclick="showSection('faq')">FAQ</a>
-                <a href="#contact" class="block px-3 py-2 text-gray-700" onclick="showSection('contact')">Contact</a>
                 <a href="#admin" class="block px-3 py-2 text-gray-700" onclick="showSection('admin')">Admin</a>
             </div>
         </div>
@@ -242,44 +331,50 @@
                 <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
                     Discover verified, affordable, and comfortable hostels for students. Safe accommodation with modern facilities in the best locations of Lahore.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="scrollToHostels()" class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
-                        Browse Hostels
-                    </button>
-                    <button onclick="openWhatsApp()" class="bg-green-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
-                        WhatsApp Chat
-                    </button>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filter-container">
+                <h3 class="text-lg font-semibold mb-4">Find Your Perfect Hostel</h3>
+                <div class="grid md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                        <select id="gender-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                            <option value="all">All Genders</option>
+                            <option value="Male">Male Only</option>
+                            <option value="Female">Female Only</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                        <select id="location-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                            <option value="all">All Locations</option>
+                            <option value="DHA">DHA</option>
+                            <option value="Gulberg">Gulberg</option>
+                            <option value="Johar Town">Johar Town</option>
+                            <option value="Model Town">Model Town</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Budget Range</label>
+                        <select id="budget-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                            <option value="all">All Budgets</option>
+                            <option value="5000-10000">5,000 - 10,000 PKR</option>
+                            <option value="10000-15000">10,000 - 15,000 PKR</option>
+                            <option value="15000-20000">15,000 - 20,000 PKR</option>
+                            <option value="20000+">20,000+ PKR</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                        <input type="text" id="search-input" placeholder="Search hostels..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                    </div>
                 </div>
             </div>
 
-            <!-- Features -->
-            <div class="grid md:grid-cols-3 gap-8 py-16">
-                <div class="text-center">
-                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="hgi-stroke hgi-shield-security text-purple-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Verified & Safe</h3>
-                    <p class="text-gray-600">All hostels are personally verified for safety and quality standards.</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="hgi-stroke hgi-money-bag-02 text-blue-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Affordable Rates</h3>
-                    <p class="text-gray-600">Budget-friendly options without compromising on quality and comfort.</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="hgi-stroke hgi-location-01 text-green-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Prime Locations</h3>
-                    <p class="text-gray-600">Conveniently located near universities and major transport hubs.</p>
-                </div>
-            </div>
-
-            <!-- Live Hostels Section -->
-            <div class="py-16">
-                <div class="text-center mb-12">
+            <!-- Available Hostels Section -->
+            <div class="py-8">
+                <div class="text-center mb-8">
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Available Hostels</h2>
                     <p class="text-gray-600">Browse our verified hostel listings updated in real-time</p>
                 </div>
@@ -295,27 +390,69 @@
                     <!-- Hostels will be loaded here dynamically -->
                 </div>
             </div>
+
+            <!-- Google AdSense Ad Slot -->
+            <div class="text-center py-8">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                     data-ad-slot="YOUR_AD_SLOT_ID"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
+            <!-- Why Choose HOSTALL Section -->
+            <div class="py-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose HOSTALL?</h2>
+                    <p class="text-gray-600">Discover what makes us the most trusted hostel platform in Lahore</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">📍</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Smart Location Selection</h3>
+                        <p class="text-gray-600 mb-2">Hostels near major universities and commercial areas with easy transport access</p>
+                        <p class="text-sm text-purple-600 font-medium">Strategic Positioning</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">🎯</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Smart Matching</h3>
+                        <p class="text-gray-600 mb-2">Advanced filters help you find hostels matching your budget and preferences</p>
+                        <p class="text-sm text-blue-600 font-medium">Perfect Fit Every Time</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">✅</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Verified Listings</h3>
+                        <p class="text-gray-600 mb-2">Every hostel listed is physically visited by our team for verification</p>
+                        <p class="text-sm text-green-600 font-medium">Quality Guaranteed</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Hostels Section -->
-    <section id="hostels" class="section hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-            <h2 class="text-3xl font-bold text-center mb-8">All Hostels</h2>
+    <!-- Hostel Details Page -->
+    <section id="hostel-details" class="hostel-details-page hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <button class="back-button" onclick="showSection('home')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Hostels
+            </button>
             
-            <!-- Filters -->
-            <div class="flex flex-wrap gap-4 mb-8 justify-center">
-                <select id="gender-filter" class="px-4 py-2 border rounded-lg">
-                    <option value="all">All Genders</option>
-                    <option value="Male">Male Only</option>
-                    <option value="Female">Female Only</option>
-                </select>
-                <input type="text" id="search-input" placeholder="Search hostels..." class="px-4 py-2 border rounded-lg">
-            </div>
-            
-            <!-- Hostels Grid -->
-            <div id="hostels-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Hostels will be loaded here -->
+            <div id="hostel-details-content">
+                <!-- Hostel details will be loaded here -->
             </div>
         </div>
     </section>
@@ -332,6 +469,13 @@
                     Our mission is to revolutionize the student accommodation experience by providing a comprehensive, trustworthy platform that connects students with verified, quality hostels. We strive to make the transition to independent living smooth, safe, and affordable for every student.
                 </p>
                 <div class="grid md:grid-cols-2 gap-8 mt-12">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Our Vision</h3>
+                        <p class="text-gray-600">To become Pakistan's most trusted student accommodation platform, setting new standards for transparency and safety.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Our Mission</h3>
+                        <p class="text-gray-600">Connecting students with quality, verified hostels while ensuring safety, affordability, and convenience.</p>
                     </div>
                 </div>
             </div>
@@ -359,7 +503,7 @@
                         <i class="hgi-stroke hgi-arrow-down-01 transform transition-transform"></i>
                     </h3>
                     <div class="faq-answer hidden">
-                        <p class="text-gray-600">Yes, all hostels listed on HOSTALL are personally visted and verified by our team for correct information. However the actual information details may change from time to time. It is recommended to personally confirm the information and visit before final payment.</p>
+                        <p class="text-gray-600">Yes, all hostels listed on HOSTALL are personally visited and verified by our team for correct information. However the actual information details may change from time to time. It is recommended to personally confirm the information and visit before final payment.</p>
                     </div>
                 </div>
                 
@@ -385,40 +529,12 @@
                 
                 <div class="faq-item bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold mb-2 cursor-pointer flex items-center justify-between" onclick="toggleFAQ(this)">
-                        Is Hostall responsible if the hostel is not as shown in Picture or details not matched?
+                        Is HOSTALL responsible if the hostel is not as shown in Picture or details not matched?
                         <i class="hgi-stroke hgi-arrow-down-01 transform transition-transform"></i>
                     </h3>
                     <div class="faq-answer hidden">
-                        <p class="text-gray-600">No. Hostall is a listing platform and does not own or operate any hostel. We strive to keep data accurate, but are not liable for any mismatches.</p>
+                        <p class="text-gray-600">No. HOSTALL is a listing platform and does not own or operate any hostel. We strive to keep data accurate, but are not liable for any mismatches.</p>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="section hidden">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-            <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div>
-                    <h3 class="text-xl font-semibold mb-4">Get in Touch</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center">
-                            <i class="hgi-stroke hgi-mail-01 text-purple-600 mr-3"></i>
-                            <span>teamhostall@gmail.com</span>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="hgi-stroke hgi-location-01 text-purple-600 mr-3"></i>
-                            <span>Lahore, Punjab, Pakistan</span>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="text-xl font-semibold mb-4">Quick Contact</h3>
-                    <button onclick="openWhatsApp()" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
-                        Chat on WhatsApp
-                    </button>
                 </div>
             </div>
         </div>
@@ -500,50 +616,7 @@
                     <div id="admin-messages-tab" class="admin-tab-content hidden p-6">
                         <h3 class="text-lg font-semibold mb-6">Messages & Inquiries</h3>
                         <div id="admin-messages-list" class="space-y-4">
-                            <!-- Sample messages -->
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h4 class="font-semibold">Ahmad Khan</h4>
-                                        <p class="text-sm text-gray-500">+92-300-1234567</p>
-                                    </div>
-                                    <span class="text-xs text-gray-400">2 hours ago</span>
-                                </div>
-                                <p class="text-gray-700 mb-3">Hi, I'm interested in Al-Noor Boys Hostel. Can you tell me about availability and pricing?</p>
-                                <div class="flex gap-2">
-                                    <button onclick="replyViaWhatsApp('+923001234567')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
-                                        Reply via WhatsApp
-                                    </button>
-                                    <button onclick="replyViaEmail('ahmad@example.com')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
-                                        Reply via Email
-                                    </button>
-                                    <button onclick="markAsResolved(this)" class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
-                                        Mark Resolved
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h4 class="font-semibold">Fatima Ali</h4>
-                                        <p class="text-sm text-gray-500">+92-301-9876543</p>
-                                    </div>
-                                    <span class="text-xs text-gray-400">5 hours ago</span>
-                                </div>
-                                <p class="text-gray-700 mb-3">Looking for a girls hostel near University of Punjab. Do you have any recommendations?</p>
-                                <div class="flex gap-2">
-                                    <button onclick="replyViaWhatsApp('+923019876543')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
-                                        Reply via WhatsApp
-                                    </button>
-                                    <button onclick="replyViaEmail('fatima@example.com')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
-                                        Reply via Email
-                                    </button>
-                                    <button onclick="markAsResolved(this)" class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
-                                        Mark Resolved
-                                    </button>
-                                </div>
-                            </div>
+                            <!-- Messages will be loaded here -->
                         </div>
                     </div>
 
@@ -551,6 +624,16 @@
                     <div id="admin-settings-tab" class="admin-tab-content hidden p-6">
                         <h3 class="text-lg font-semibold mb-6">Admin Settings</h3>
                         <div class="space-y-6">
+                            <div>
+                                <h4 class="font-medium mb-2">Google Analytics</h4>
+                                <input type="text" id="ga-measurement-id" placeholder="GA_MEASUREMENT_ID" class="w-full px-3 py-2 border rounded-lg">
+                                <p class="text-sm text-gray-500 mt-1">Enter your Google Analytics Measurement ID</p>
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-2">Google AdSense</h4>
+                                <input type="text" id="adsense-publisher-id" placeholder="ca-pub-YOUR_PUBLISHER_ID" class="w-full px-3 py-2 border rounded-lg">
+                                <p class="text-sm text-gray-500 mt-1">Enter your Google AdSense Publisher ID</p>
+                            </div>
                             <div>
                                 <h4 class="font-medium mb-2">Contact Information</h4>
                                 <div class="grid md:grid-cols-2 gap-4">
@@ -561,6 +644,11 @@
                             <div>
                                 <h4 class="font-medium mb-2">WhatsApp Settings</h4>
                                 <input type="tel" placeholder="WhatsApp Number" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-2">Privacy Policy & Terms</h4>
+                                <textarea id="privacy-policy" rows="4" placeholder="Privacy Policy Content" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                                <textarea id="terms-of-service" rows="4" placeholder="Terms of Service Content" class="w-full px-3 py-2 border rounded-lg mt-2"></textarea>
                             </div>
                             <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
                                 Save Settings
@@ -582,7 +670,7 @@
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8">
+            <div class="grid md:grid-cols-3 gap-8">
                 <!-- Company Info -->
                 <div>
                     <div class="flex items-center mb-4">
@@ -593,12 +681,12 @@
                         Pakistan's premier hostel listing platform, connecting students with quality accommodations.
                     </p>
                     <div class="flex space-x-4">
-                        <a href="https://facebook.com/hostall" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                        <a href="https://www.facebook.com/hostall" target="_blank" class="text-gray-400 hover:text-white transition-colors">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                             </svg>
                         </a>
-                        <a href="https://instagram.com/hostall" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                        <a href="https://www.instagram.com/hostall" target="_blank" class="text-gray-400 hover:text-white transition-colors">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.611-3.197-1.559-.748-.948-1.197-2.25-1.197-3.654 0-1.404.449-2.706 1.197-3.654.749-.948 1.9-1.559 3.197-1.559s2.448.611 3.197 1.559c.748.948 1.197 2.25 1.197 3.654 0 1.404-.449 2.706-1.197 3.654-.749.948-1.9 1.559-3.197 1.559zm7.138 0c-1.297 0-2.448-.611-3.197-1.559-.748-.948-1.197-2.25-1.197-3.654 0-1.404.449-2.706 1.197-3.654.749-.948 1.9-1.559 3.197-1.559s2.448.611 3.197 1.559c.748.948 1.197 2.25 1.197 3.654 0 1.404-.449 2.706-1.197 3.654-.749.948-1.9 1.559-3.197 1.559z"/>
                             </svg>
@@ -618,18 +706,6 @@
                         <li><a href="#home" onclick="showSection('home')" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
                         <li><a href="#about" onclick="showSection('about')" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
                         <li><a href="#faq" onclick="showSection('faq')" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
-                        <li><a href="#contact" onclick="showSection('contact')" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-
-                <!-- Services -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Services</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Boys Hostels</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Girls Hostels</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Verified Listings</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">24/7 Support</a></li>
                         <li><a href="#admin" onclick="showSection('admin')" class="text-gray-400 hover:text-white transition-colors">List Your Hostel</a></li>
                     </ul>
                 </div>
@@ -643,10 +719,6 @@
                             <span class="text-gray-400">teamhostall@gmail.com</span>
                         </div>
                         <div class="flex items-center">
-                            <i class="hgi-stroke hgi-call mr-2"></i>
-                            <span class="text-gray-400">+92-333-1536041</span>
-                        </div>
-                        <div class="flex items-center">
                             <i class="hgi-stroke hgi-location-01 mr-2"></i>
                             <span class="text-gray-400">Lahore, Punjab, Pakistan</span>
                         </div>
@@ -658,8 +730,8 @@
             <div class="border-t border-gray-800 mt-8 pt-8 text-center">
                 <p class="text-gray-400">
                     © 2025 HOSTALL. All rights reserved. | 
-                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a> | 
-                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="#" onclick="openPrivacyPolicy()" class="hover:text-white transition-colors">Privacy Policy</a> | 
+                    <a href="#" onclick="openTermsOfService()" class="hover:text-white transition-colors">Terms of Service</a>
                 </p>
             </div>
         </div>
@@ -692,8 +764,8 @@
                         <input type="text" id="chat-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div class="mb-4">
-                        <label for="chat-phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                        <input type="tel" id="chat-phone" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label for="chat-contact" class="block text-sm font-medium text-gray-700 mb-2">Phone Number or Email</label>
+                        <input type="text" id="chat-contact" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Phone number or email address">
                     </div>
                     <div class="mb-4">
                         <label for="chat-message" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
@@ -708,6 +780,44 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-policy-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+            <div class="flex items-center justify-between p-4 border-b">
+                <h3 class="text-lg font-semibold">Privacy Policy</h3>
+                <button onclick="closePrivacyPolicy()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="privacy-policy-content">
+                    <p>Privacy policy content will be loaded from admin settings...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms of Service Modal -->
+    <div id="terms-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+            <div class="flex items-center justify-between p-4 border-b">
+                <h3 class="text-lg font-semibold">Terms of Service</h3>
+                <button onclick="closeTermsOfService()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="terms-content">
+                    <p>Terms of service content will be loaded from admin settings...</p>
+                </div>
             </div>
         </div>
     </div>
