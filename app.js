@@ -113,6 +113,9 @@ function createHostelCard(hostel) {
         <button class="view-details-btn" onclick="openHostelDetailsPage(${hostel.id})">
           View Details
         </button>
+        <button class="view-details-btn" onclick="openHostelDetailsPage(${hostel.id})">
+          View Details
+        </button>
       </div>
     </div>
   `;
@@ -653,27 +656,6 @@ async function loadMoreReviews(hostelId) {
     document.body.appendChild(modal);
     
   } catch (error) {
-    console.error('Error loading more reviews:', error);
-  }
-}
-// Call hostel function
-function callHostel(phoneNumber) {
-  if (phoneNumber && phoneNumber !== 'Phone not provided') {
-    window.location.href = `tel:${phoneNumber}`;
-  } else {
-    alert('Phone number not available');
-  }
-}
-
-// Open WhatsApp chat
-function openWhatsAppChat(phoneNumber) {
-  if (phoneNumber && phoneNumber !== 'WhatsApp not provided') {
-    const message = 'Hi! I found your hostel on HOSTALL and I\'m interested in learning more about accommodation options.';
-    const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^\d]/g, '')}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  } else {
-    alert('WhatsApp number not available');
-  }
 }
 
 // Helper functions
