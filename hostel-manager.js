@@ -95,6 +95,9 @@ class HostelManager {
         <button class="view-details-btn" onclick="hostelManager.showHostelDetails(${JSON.stringify(hostel).replace(/"/g, '&quot;')})">
           View Details
         </button>
+        <button class="view-details-btn" onclick="openHostelDetailsPage(${hostel.id})" style="width: 100%; margin-top: 0.5rem;">
+          View Details
+        </button>
       </div>
     `;
 
@@ -103,24 +106,8 @@ class HostelManager {
 
   // Show hostel details popup
   showHostelDetails(hostel) {
-    const facilities = hostel.facilities ? 
-      (Array.isArray(hostel.facilities) ? hostel.facilities.join(', ') : hostel.facilities) : 
-      'Not specified';
-
-    // Check if hostel has enhanced data
-    const hasEnhancedData = hostel.rent || hostel.monthly_rent || hostel.security_deposit || 
-                           hostel.contact_person || hostel.office_hours || hostel.checkin_time ||
-                           hostel.other_facilities || hostel.email || hostel.website;
-
-    let details;
-    
-    if (hasEnhancedData) {
-      details = this.getEnhancedDetails(hostel, facilities);
-    } else {
-      details = this.getSimpleDetails(hostel, facilities);
-    }
-
-    alert(details);
+    // Navigate to details page instead of showing popup
+    openHostelDetailsPage(hostel.id);
   }
 
   // Get enhanced details format

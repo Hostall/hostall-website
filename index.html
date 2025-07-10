@@ -228,6 +228,11 @@
         .back-button:hover {
             background: #4b5563;
         }
+        
+        .hostel-details-page {
+            background: #f9fafb;
+            min-height: 100vh;
+        }
 
         .message-item {
             background: white;
@@ -294,6 +299,74 @@
         
         .carousel-indicator:hover {
             transform: scale(1.2);
+        }
+        
+        /* Hostel Details Styles */
+        .hostel-details-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .hostel-details-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .hostel-details-content {
+            padding: 2rem;
+        }
+        
+        .detail-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .detail-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .facility-tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+        }
+        
+        .contact-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+        
+        .contact-button.phone {
+            background: #10b981;
+            color: white;
+        }
+        
+        .contact-button.whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        
+        .contact-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 </head>
 <body class="bg-gray-50">
@@ -392,13 +465,13 @@
             <div class="py-8">
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Available Hostels</h2>
-                    <p class="text-gray-600">Browse our verified hostel listings updated in real-time</p>
+                    <p class="text-gray-600">Browse our verified hostel listings</p>
                 </div>
 
                 <!-- Loading State -->
                 <div id="loading-hostels" class="text-center py-12">
                     <div class="loading-spinner mx-auto mb-4"></div>
-                    <p class="text-gray-600">Loading hostels from database...</p>
+                    <p class="text-gray-600">Loading hostels...</p>
                 </div>
 
                 <!-- Hostels Grid -->
@@ -459,12 +532,12 @@
 
     <!-- Hostel Details Page -->
     <section id="hostel-details" class="section hidden">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
             <button class="back-button" onclick="showSection('home')">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
-                Back to Hostels
+                ← Back to Home
             </button>
             
             <div id="hostel-details-content">

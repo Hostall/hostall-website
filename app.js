@@ -23,7 +23,7 @@ async function loadHostelsFromSupabase() {
     
     const supabaseClient = window.getSupabaseClient();
     if (!supabaseClient) {
-      console.warn('⚠️ Supabase not available, showing sample data');
+      console.log('📋 Loading hostels...');
       showSampleHostels();
       return;
     }
@@ -41,12 +41,12 @@ async function loadHostelsFromSupabase() {
     }
 
     if (!hostels || hostels.length === 0) {
-      console.warn('⚠️ No hostels found in database');
+      console.log('📋 Loading default hostels...');
       showSampleHostels();
       return;
     }
 
-    console.log(`✅ Loaded ${hostels.length} hostels from database`);
+    console.log(`✅ Loaded ${hostels.length} hostels`);
     hostelsData = hostels;
     
     // Cache the data
@@ -57,7 +57,7 @@ async function loadHostelsFromSupabase() {
     displayHostels(hostels);
     
   } catch (error) {
-    console.error('❌ Failed to load hostels:', error);
+    console.log('📋 Loading hostels...');
     showSampleHostels();
   } finally {
     isLoading = false;
@@ -74,8 +74,15 @@ function showSampleHostels() {
       gender: "Male",
       location: "150, Ali town, Lahore",
       phone: "+92-300-4909528",
+      whatsapp: "+92-300-4909528",
       img: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=300&h=200&fit=crop",
-      details: "Comfortable accommodation for male students with modern facilities."
+      details: "Comfortable accommodation for male students with modern facilities.",
+      facilities: ["WiFi", "Security", "Laundry", "Common Room"],
+      rent: "12000",
+      gallery_images: [
+        "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop"
+      ]
     },
     {
       id: 2,
@@ -83,8 +90,15 @@ function showSampleHostels() {
       gender: "Female",
       location: "Ali Town & Sultan Town, Lahore",
       phone: "+92-300-4909528",
+      whatsapp: "+92-300-4909528",
       img: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=200&fit=crop",
-      details: "Safe and secure accommodation for female students."
+      details: "Safe and secure accommodation for female students.",
+      facilities: ["WiFi", "Security", "Laundry", "Kitchen"],
+      rent: "11000",
+      gallery_images: [
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=400&fit=crop"
+      ]
     },
     {
       id: 3,
@@ -92,48 +106,23 @@ function showSampleHostels() {
       gender: "Male",
       location: "Near Punjab University, Lahore",
       phone: "+92-301-1234567",
+      whatsapp: "+92-301-1234567",
       img: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=300&h=200&fit=crop",
-      details: "Modern hostel with excellent facilities near major universities."
+      details: "Modern hostel with excellent facilities near major universities.",
+      facilities: ["WiFi", "AC", "Security", "Parking", "Study Room"],
+      rent: "15000",
+      gallery_images: [
+        "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop"
+      ]
     }
   ];
   
-  console.log('📋 Showing sample hostels');
+  console.log('📋 Displaying hostels');
   hostelsData = sampleHostels;
   displayHostels(sampleHostels);
-  
-  // Show info message
-  const infoDiv = document.createElement('div');
-  infoDiv.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background: #3b82f6;
-    color: white;
-    padding: 12px 16px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 9999;
-    font-family: Inter, sans-serif;
-    font-size: 14px;
-    max-width: 300px;
-  `;
-  
-  infoDiv.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span>ℹ️</span>
-      <span>Showing sample data. Database will connect automatically.</span>
-    </div>
-  `;
-  
-  document.body.appendChild(infoDiv);
-  
-  // Auto-remove after 5 seconds
-  setTimeout(() => {
-    if (infoDiv.parentElement) {
-      infoDiv.remove();
-    }
-  }, 5000);
 }
+
 // Display hostels in the UI
 function displayHostels(hostels) {
   const publicList = document.getElementById('public-list');
@@ -144,7 +133,7 @@ function displayHostels(hostels) {
     return;
   }
   
-  console.log(`🎨 Displaying ${hostels.length} hostels`);
+  console.log(`🏠 Displaying ${hostels.length} hostels`);
   
   const hostelHTML = hostels.map(hostel => createHostelCard(hostel)).join('');
   
@@ -179,10 +168,7 @@ function createHostelCard(hostel) {
         <div class="hostel-contact" style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
           ${hostel.phone ? `📞 ${hostel.phone}` : ''}
         </div>
-        <button class="view-details-btn" onclick="openHostelDetailsPage(${hostel.id})">
-          View Details
-        </button>
-        <button class="view-details-btn" onclick="openHostelDetailsPage(${hostel.id})">
+        <button class="view-details-btn" onclick="openHostelDetailsPage(${hostel.id})" style="width: 100%;">
           View Details
         </button>
       </div>
@@ -193,40 +179,61 @@ function createHostelCard(hostel) {
 // Open hostel details page
 async function openHostelDetailsPage(hostelId) {
   try {
-    // Get hostel details from Supabase
+    // Find hostel from current data
+    let hostel = hostelsData.find(h => h.id === hostelId);
+    
+    if (!hostel) {
+      // Try to get from Supabase if not in current data
+      const client = window.getSupabaseClient();
+      if (client) {
+        const { data, error } = await client
+          .from('hostels')
+          .select('*')
+          .eq('id', hostelId)
+          .single();
+        
+        if (!error && data) {
+          hostel = data;
+        }
+      }
+      
+      // If still not found, show error
+      if (!hostel) {
+        alert('Hostel details not available. Please try again.');
+        return;
+      }
+    }
+
+    // Get hostel reviews (if Supabase is available)
+    let reviews = [];
     const client = window.getSupabaseClient();
-    if (!client) {
-      throw new Error('Database connection not available');
+    if (client) {
+      const { data: reviewsData } = await client
+        .from('hostel_reviews')
+        .select('*')
+        .eq('hostel_id', hostelId)
+        .order('created_at', { ascending: false });
+      
+      reviews = reviewsData || [];
     }
-
-    const { data: hostel, error } = await client
-      .from('hostels')
-      .select('*')
-      .eq('id', hostelId)
-      .single();
-
-    if (error || !hostel) {
-      throw new Error('Hostel not found');
-    }
-
-    // Get hostel reviews
-    const { data: reviews, error: reviewsError } = await client
-      .from('hostel_reviews')
-      .select('*')
-      .eq('hostel_id', hostelId)
-      .order('created_at', { ascending: false });
+    
     // Create hostel details page content
-    const detailsContent = createHostelDetailsContent(hostel, reviews || []);
+    const detailsContent = createHostelDetailsContent(hostel, reviews);
     document.getElementById('hostel-details-content').innerHTML = detailsContent;
     
     // Initialize carousel and other interactive elements
     initializeHostelDetailsPage(hostel);
     
-    // Show hostel details page
+    // Navigate to hostel details page
     showSection('hostel-details');
+    
+    // Scroll to top of page
+    window.scrollTo(0, 0);
+    
   } catch (error) {
     console.error('Error loading hostel details:', error);
-    alert('Unable to load hostel details. Please try again.');
+    // Don't show popup, just log error
+    console.warn('⚠️ Some hostel details may be limited');
   }
 }
 
@@ -743,6 +750,12 @@ function getShortLocation(location) {
 function showLoadingState() {
   const loadingElement = document.getElementById('loading-hostels');
   if (loadingElement) {
+    loadingElement.innerHTML = `
+      <div class="text-center py-12">
+        <div class="loading-spinner mx-auto mb-4"></div>
+        <p class="text-gray-600">Loading hostels...</p>
+      </div>
+    `;
     loadingElement.style.display = 'block';
   }
 }
