@@ -95,9 +95,6 @@ class HostelManager {
         <button class="view-details-btn" onclick="hostelManager.showHostelDetails(${JSON.stringify(hostel).replace(/"/g, '&quot;')})">
           View Details
         </button>
-        <button class="view-details-btn" onclick="openHostelDetailsPage(${hostel.id})" style="width: 100%; margin-top: 0.5rem;">
-          View Details
-        </button>
       </div>
     `;
 
