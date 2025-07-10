@@ -110,10 +110,6 @@
             background-color: #ec4899;
         }
         
-        .hostel-gender-badge.any {
-            background-color: #6b7280;
-        }
-        
         .hostel-image-container {
             position: relative;
         }
@@ -227,11 +223,6 @@
 
         .back-button:hover {
             background: #4b5563;
-        }
-        
-        .hostel-details-page {
-            background: #f9fafb;
-            min-height: 100vh;
         }
 
         .message-item {
@@ -468,12 +459,6 @@
                     <p class="text-gray-600">Browse our verified hostel listings</p>
                 </div>
 
-                <!-- Loading State -->
-                <div id="loading-hostels" class="text-center py-12">
-                    <div class="loading-spinner mx-auto mb-4"></div>
-                    <p class="text-gray-600">Loading hostels...</p>
-                </div>
-
                 <!-- Hostels Grid -->
                 <div id="public-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Hostels will be loaded here dynamically -->
@@ -545,6 +530,104 @@
             </div>
         </div>
     </section>
+
+    <section id="about">
+    <div class="content-section">
+      <!-- Hero Section -->
+      <div class="about-hero">
+        <h1 class="about-main-title">HOSTALL</h1>
+        <p class="about-subtitle">Transforming Student Accommodation in Lahore</p>
+        <div class="about-intro-text">
+          <p>Welcome to HOSTALL – helping you find a home among the Zinda Dilan-e-Lahore.</p>
+        </div>
+      </div>
+      
+      <!-- Main Content Grid -->
+      <div class="about-content-grid">
+        <!-- Our Story -->
+        <div class="about-story-section">
+          <div class="about-content-block">
+            <div class="about-image-container">
+              <img src="https://public.youware.com/users-website-assets/prod/eece562c-b820-4d93-ac82-ae67b689ba1d/f55329116b65461d87b2a1feafb59939.jpg" alt="Modern hostel accommodation" class="about-image">
+              <div class="about-image-overlay">
+                <span class="about-image-badge">🏠 Quality Living</span>
+              </div>
+            </div>
+            <div class="about-text-content">
+              <h2 class="about-section-title">Helping you find a replica of your home</h2>
+              <p class="about-description">
+                Moving to a new city like Lahore, whether for studies or a job, can be exciting, but finding the right place to live isn't always easy. That's where we come in.
+              </p>
+              <p class="about-description">
+                HOSTALL is your reliable guide to discovering verified hostels, complete with smart filters, and all the details you need to make the best decision. Whether you're a student looking for a quiet place to focus or a professional needing comfort and convenience, we have got you covered.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Our Mission -->
+        <div class="about-mission-section">
+          <div class="about-content-block reverse">
+            <div class="about-text-content">
+              <h2 class="about-section-title">Your Local Friend in Lahore</h2>
+              <p class="about-description">
+                We gather and share all the details you need, rent, facilities, nearby landmarks, and real photos, so you can make the right decision before even packing your bags. Think of us as your local friend in Lahore, helping you explore your options and find a place that fits your lifestyle and budget.
+              </p>
+              <div class="about-mission-points">
+                <div class="mission-point">
+                  <span class="mission-icon">🔍</span>
+                  <span>Verified listings with real photos and honest reviews</span>
+                </div>
+                <div class="mission-point">
+                  <span class="mission-icon">💰</span>
+                  <span>Transparent pricing with no hidden costs</span>
+                </div>
+                <div class="mission-point">
+                  <span class="mission-icon">⚡</span>
+                  <span>Instant connectivity with hostel management</span>
+                </div>
+                <div class="mission-point">
+                  <span class="mission-icon">👥</span>
+                  <span>Dedicated Team to support you through every step.</span>
+                </div>
+                <div class="mission-point">
+                  <span class="mission-icon">🎯</span>
+                  <span>24/7 Customer Support</span>
+                </div>
+              </div>
+              <p class="about-description" style="margin-top: 1rem; font-style: italic;">
+                Because your peace of mind matters.
+              </p>
+            </div>
+            <div class="about-image-container">
+              <img src="https://public.youware.com/users-website-assets/prod/eece562c-b820-4d93-ac82-ae67b689ba1d/44384731a3d24267b148320520632ee8.jpg" alt="Our dedicated team" class="about-image">
+              <div class="about-image-overlay">
+                <span class="about-image-badge">👥 Our Team</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Our Commitment -->
+        <div class="about-commitment-section">
+          <div class="about-content-block">
+            <div class="about-image-container">
+              <img src="https://public.youware.com/users-website-assets/prod/eece562c-b820-4d93-ac82-ae67b689ba1d/8fae1e4c427849ca8f695d5f0ad7b282.jpg" alt="24/7 customer support" class="about-image">
+              <div class="about-image-overlay">
+                <span class="about-image-badge">🎯 Support</span>
+              </div>
+            </div>
+            <div class="about-text-content">
+              <h2 class="about-section-title">Start Your Journey on the Right Foot</h2>
+              <p class="about-description">
+                Lahore has so much to offer, and your journey begins with the right place to stay.
+                Let HOSTALL help you find a hostel that truly feels like home, so you can focus on what really matters: your future.
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </div>
 
     <!-- About Section -->
     <section id="about" class="section hidden">
@@ -780,7 +863,7 @@
                                 <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.611-3.197-1.559-.748-.948-1.197-2.25-1.197-3.654 0-1.404.449-2.706 1.197-3.654.749-.948 1.9-1.559 3.197-1.559s2.448.611 3.197 1.559c.748.948 1.197 2.25 1.197 3.654 0 1.404-.449 2.706-1.197 3.654-.749.948-1.9 1.559-3.197 1.559zm7.138 0c-1.297 0-2.448-.611-3.197-1.559-.748-.948-1.197-2.25-1.197-3.654 0-1.404.449-2.706 1.197-3.654.749-.948 1.9-1.559 3.197-1.559s2.448.611 3.197 1.559c.748.948 1.197 2.25 1.197 3.654 0 1.404-.449 2.706-1.197 3.654-.749.948-1.9 1.559-3.197 1.559z"/>
                             </svg>
                         </a>
-                        <a href="https://wa.me/923331536041" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                        <a href="https://whatsapp.com/channel/0029VbAikYk4o7qO5966Ux3u" target="_blank" class="text-gray-400 hover:text-white transition-colors">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
                             </svg>
