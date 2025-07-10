@@ -21,49 +21,25 @@ let initializationAttempts = 0;
 function initializeSupabase() {
   const maxAttempts = CONFIG.app.retryAttempts;
   
-  if (initializationAttempts >= maxAttempts) {
-    console.error('❌ Max Supabase initialization attempts reached');
-    return false;
-  }
-  
-  initializationAttempts++;
-  
   if (typeof window.supabase !== 'undefined' && CONFIG.supabase.url && CONFIG.supabase.key) {
     try {
       supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.key);
-      console.log(`✅ Supabase initialized successfully (attempt ${initializationAttempts})`);
-      initializationAttempts = 0; // Reset on success
+      console.log('✅ Supabase initialized successfully');
       return true;
     } catch (error) {
-      console.error(`❌ Supabase initialization failed (attempt ${initializationAttempts}):`, error);
-      
-      // Retry after delay if not max attempts
-      if (initializationAttempts < maxAttempts) {
-        setTimeout(() => {
-          console.log(`⏳ Retrying Supabase initialization in ${CONFIG.app.retryDelay}ms...`);
-          initializeSupabase();
-        }, CONFIG.app.retryDelay);
-      }
+      console.warn('⚠️ Supabase initialization failed:', error);
       return false;
     }
   } else {
-    console.warn(`⚠️ Supabase dependencies not ready (attempt ${initializationAttempts})`);
-    
-    // Retry after delay if not max attempts
-    if (initializationAttempts < maxAttempts) {
-      setTimeout(() => {
-        initializeSupabase();
-      }, CONFIG.app.retryDelay);
-    }
+    console.warn('⚠️ Supabase dependencies not ready');
+    return false;
   }
-  return false;
 }
 
 // Enhanced getter with validation
 window.getSupabaseClient = () => {
   if (!supabaseClient) {
-    console.warn('⚠️ Supabase client not initialized, attempting initialization...');
-    initializeSupabase();
+    console.warn('⚠️ Supabase client not available');
   }
   return supabaseClient;
 };

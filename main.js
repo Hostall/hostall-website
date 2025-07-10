@@ -14,16 +14,16 @@ class App {
     try {
       console.log('🚀 Initializing HOSTALL...');
       
-      // Increment retry counter
-      this.initializationRetries++;
-      
       // Wait for DOM to be ready
       if (document.readyState === 'loading') {
         await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve));
       }
 
-      // Initialize Supabase
-      window.initializeSupabase();
+      // Initialize Supabase with better error handling
+      const supabaseReady = await this.initializeSupabaseWithRetry();
+      if (!supabaseReady) {
+        console.warn('⚠️ Supabase not available, continuing with limited functionality');
+      }
 
       // Initialize managers
       await this.initializeManagers();
@@ -39,25 +39,90 @@ class App {
 
       this.isInitialized = true;
       console.log('✅ HOSTALL initialized successfully');
-      this.initializationRetries = 0; // Reset on success
     } catch (error) {
       console.error('❌ App initialization failed:', error);
-      
-      if (this.initializationRetries < this.maxRetries) {
-        setTimeout(() => {
-          console.log('🔄 Retrying application initialization...');
-          this.init();
-        }, 3000);
-      } else {
-        this.showInitializationError();
-      }
+      // Don't show error popup for minor issues
+      this.handleInitializationError(error);
     }
   }
 
-  // Show initialization error to user
-  showInitializationError() {
+  // Initialize Supabase with retry logic
+  async initializeSupabaseWithRetry() {
+    try {
+      if (typeof window.initializeSupabase === 'function') {
+        const result = window.initializeSupabase();
+        if (result) {
+          console.log('✅ Supabase initialized successfully');
+          return true;
+        }
+      }
+      
+      // Wait a bit and try again
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (window.getSupabaseClient && window.getSupabaseClient()) {
+        console.log('✅ Supabase client available');
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.warn('⚠️ Supabase initialization issue:', error);
+      return false;
+    }
+  }
+
+  // Handle initialization errors gracefully
+  handleInitializationError(error) {
+    // Only show popup for critical errors
+    if (error.message.includes('critical') || error.message.includes('fatal')) {
+      this.showCriticalError(error);
+    } else {
+      // For minor errors, just log and continue
+      console.warn('⚠️ Minor initialization issue:', error.message);
+      this.showMinorErrorNotification();
+    }
+  }
+
+  // Show minor error notification (not blocking popup)
+  showMinorErrorNotification() {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #fbbf24;
+      color: #92400e;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 9999;
+      font-family: Inter, sans-serif;
+      font-size: 14px;
+      max-width: 300px;
+    `;
+    
+    notification.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span>⚠️</span>
+        <span>Some features may be limited. Retrying connection...</span>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.remove();
+      }
+    }, 5000);
+  }
+
+  // Show critical error (only for serious issues)
+  showCriticalError(error) {
     const errorDiv = document.createElement('div');
-    errorDiv.className = 'initialization-error';
+    errorDiv.className = 'critical-error';
     errorDiv.style.cssText = `
       position: fixed;
       top: 0;
@@ -75,14 +140,14 @@ class App {
     
     errorDiv.innerHTML = `
       <div style="text-align: center; padding: 2rem; background: #1f2937; border-radius: 12px; max-width: 400px;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
-        <h2 style="margin-bottom: 1rem; color: #f59e0b;">Initialization Failed</h2>
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🔧</div>
+        <h2 style="margin-bottom: 1rem; color: #f59e0b;">Service Temporarily Unavailable</h2>
         <p style="margin-bottom: 1.5rem; color: #d1d5db;">
-          Unable to connect to the database. Please check your internet connection and try again.
+          We're experiencing technical difficulties. Please try refreshing the page.
         </p>
         <button onclick="window.location.reload()" 
                 style="background: #8b5cf6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 500;">
-          Retry
+          Refresh Page
         </button>
       </div>
     `;
