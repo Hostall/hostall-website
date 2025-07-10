@@ -21,9 +21,9 @@ let initializationAttempts = 0;
 function initializeSupabase() {
   const maxAttempts = CONFIG.app.retryAttempts;
   
-  if (typeof window.supabase !== 'undefined' && CONFIG.supabase.url && CONFIG.supabase.key) {
+  if (typeof supabase !== 'undefined' && CONFIG.supabase.url && CONFIG.supabase.key) {
     try {
-      supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.key);
+      supabaseClient = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.key);
       console.log('✅ Supabase initialized successfully');
       return true;
     } catch (error) {
