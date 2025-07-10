@@ -9,8 +9,8 @@ const CONFIG = {
     name: 'HOSTALL',
     version: '2.0',
     debug: true,
-    retryAttempts: 3,
-    retryDelay: 2000
+    retryAttempts: 2,
+    retryDelay: 10000
   }
 };
 
@@ -21,9 +21,9 @@ let initializationAttempts = 0;
 function initializeSupabase() {
   const maxAttempts = CONFIG.app.retryAttempts;
   
-  if (typeof supabase !== 'undefined' && CONFIG.supabase.url && CONFIG.supabase.key) {
+  if (typeof window.supabase !== 'undefined' && CONFIG.supabase.url && CONFIG.supabase.key) {
     try {
-      supabaseClient = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.key);
+      supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.key);
       console.log('✅ Supabase initialized successfully');
       return true;
     } catch (error) {
