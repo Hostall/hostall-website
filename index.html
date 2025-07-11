@@ -185,6 +185,24 @@
         .faq-answer.hidden {
           display: none;
         }
+        
+        /* Image Carousel Styles */
+        .carousel-slide {
+          opacity: 0;
+          transition: opacity 0.5s ease-in-out;
+        }
+        
+        .carousel-slide.active {
+          opacity: 1;
+        }
+        
+        .carousel-indicator {
+          transition: background-color 0.3s ease;
+        }
+        
+        .carousel-indicator.active {
+          background-color: white !important;
+        }
     </style>
 </head>
 <body class="bg-gray-50">

@@ -154,6 +154,13 @@ class HostelManager {
                     ${hostel.gender} Only
                   </span>
                 </div>
+    // Get facilities list
+    const facilities = Array.isArray(hostel.facilities) ? hostel.facilities : 
+                      (hostel.facilities ? hostel.facilities.split(',') : []);
+    
+    // Get gallery images
+    const galleryImages = this.getHostelGallery(hostel);
+    
                 
                 <div class="flex items-start gap-3">
                   <i class="hgi-stroke hgi-location-01 text-gray-500 mt-1"></i>
@@ -164,12 +171,42 @@ class HostelManager {
                 </div>
                 
                 ${hostel.rent ? `
-                <div class="flex items-start gap-3">
-                  <i class="hgi-stroke hgi-money-bag-02 text-gray-500 mt-1"></i>
+        <!-- Hostel Header -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
                   <div>
-                    <p class="font-medium text-gray-900">Monthly Rent</p>
+            <!-- Left Column - Image Gallery -->
                     <p class="text-gray-600">Rs. ${hostel.rent}</p>
-                  </div>
+              <div class="relative">
+                <div id="image-carousel" class="relative h-80 rounded-lg overflow-hidden">
+                  ${galleryImages.map((img, index) => `
+                    <div class="carousel-slide ${index === 0 ? 'active' : ''} absolute inset-0 transition-opacity duration-500">
+                      <img src="${img.url}" 
+                           alt="${img.alt}" 
+                           class="w-full h-full object-cover"
+                           onerror="this.src='https://via.placeholder.com/600x400/6b7280/ffffff?text=Hostel+Image'">
+                    </div>
+                  `).join('')}
+                </div>
+                
+                <!-- Carousel Navigation -->
+                ${galleryImages.length > 1 ? `
+                <button onclick="window.hostelManager.previousImage()" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                <button onclick="window.hostelManager.nextImage()" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+                
+                <!-- Image Indicators -->
+                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                  ${galleryImages.map((_, index) => `
+                    <button onclick="window.hostelManager.goToImage(${index})" 
+                            class="carousel-indicator w-3 h-3 rounded-full bg-white bg-opacity-50 hover:bg-opacity-100 ${index === 0 ? 'active' : ''}"></button>
+                  `).join('')}
                 </div>
                 ` : ''}
               </div>
@@ -229,6 +266,36 @@ class HostelManager {
               </div>
               ` : ''}
               
+              <!-- Pricing Section -->
+              <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-semibold text-green-800 mb-2">💰 Pricing</h3>
+                <div class="space-y-2">
+                  ${hostel.rent ? `
+                  <div class="flex justify-between items-center">
+                    <span class="text-green-700">Monthly Rent:</span>
+                    <span class="font-bold text-green-800">Rs. ${hostel.rent}</span>
+                  </div>
+                  ` : ''}
+                  ${hostel.security_deposit ? `
+                  <div class="flex justify-between items-center">
+                    <span class="text-green-700">Security Deposit:</span>
+                    <span class="font-semibold text-green-800">Rs. ${hostel.security_deposit}</span>
+                  </div>
+                  ` : ''}
+                  ${hostel.admission_fee ? `
+                  <div class="flex justify-between items-center">
+                    <span class="text-green-700">Admission Fee:</span>
+                    <span class="font-semibold text-green-800">Rs. ${hostel.admission_fee}</span>
+                  </div>
+                  ` : ''}
+                  ${!hostel.rent && !hostel.security_deposit && !hostel.admission_fee ? `
+                  <div class="text-center text-green-700">
+                    <p>Contact for pricing details</p>
+                  </div>
+                  ` : ''}
+                </div>
+              </div>
+              
               <!-- Action Buttons -->
               <div class="space-y-3">
                 ${hostel.phone ? `
@@ -256,6 +323,41 @@ class HostelManager {
                 ` : ''}
               </div>
             </div>
+          </div>
+        </div>
+        
+        <!-- Facilities Section -->
+        ${facilities.length > 0 ? `
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">🏢 Facilities & Amenities</h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            ${facilities.map(facility => `
+              <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                <i class="hgi-stroke hgi-tick text-blue-600"></i>
+                <span class="text-gray-700 capitalize">${facility.trim()}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        ` : ''}
+        
+        <!-- Description Section -->
+        ${hostel.details ? `
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">📋 About This Hostel</h2>
+          <div class="prose prose-gray max-w-none">
+            <p class="text-gray-700 leading-relaxed">${hostel.details}</p>
+          </div>
+        </div>
+        ` : ''}
+        
+        <!-- Reviews Section -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">⭐ Reviews & Ratings</h2>
+          <div class="text-center py-8 text-gray-500">
+            <i class="hgi-stroke hgi-star text-4xl mb-4"></i>
+            <p class="text-lg">Reviews coming soon...</p>
+            <p class="text-sm">Be the first to review this hostel!</p>
           </div>
         </div>
       </div>
@@ -350,6 +452,90 @@ Additional Information:
 ${hostel.details || 'No additional details'}
 
 ${hostel.map ? '🗺️ View on map: ' + hostel.map : '❌ Map not provided'}`;
+  }
+
+  // Get hostel gallery images
+  getHostelGallery(hostel) {
+    const images = [];
+    
+    // Add main image if available
+    if (hostel.img) {
+      images.push({
+        url: hostel.img,
+        alt: `${hostel.name} - Main View`,
+        title: 'Main View'
+      });
+    }
+    
+    // Add additional gallery images if available
+    if (hostel.gallery && Array.isArray(hostel.gallery)) {
+      hostel.gallery.forEach((img, index) => {
+        images.push({
+          url: img.url || img,
+          alt: `${hostel.name} - Image ${index + 2}`,
+          title: img.title || `View ${index + 2}`
+        });
+      });
+    }
+    
+    // If no images, add placeholder
+    if (images.length === 0) {
+      images.push({
+        url: this.getPlaceholderImage(hostel),
+        alt: `${hostel.name} - Placeholder`,
+        title: 'Hostel Image'
+      });
+    }
+    
+    return images;
+  }
+
+  // Image carousel navigation
+  currentImageIndex = 0;
+  
+  nextImage() {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    
+    if (slides.length === 0) return;
+    
+    slides[this.currentImageIndex].classList.remove('active');
+    indicators[this.currentImageIndex].classList.remove('active');
+    
+    this.currentImageIndex = (this.currentImageIndex + 1) % slides.length;
+    
+    slides[this.currentImageIndex].classList.add('active');
+    indicators[this.currentImageIndex].classList.add('active');
+  }
+  
+  previousImage() {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    
+    if (slides.length === 0) return;
+    
+    slides[this.currentImageIndex].classList.remove('active');
+    indicators[this.currentImageIndex].classList.remove('active');
+    
+    this.currentImageIndex = this.currentImageIndex === 0 ? slides.length - 1 : this.currentImageIndex - 1;
+    
+    slides[this.currentImageIndex].classList.add('active');
+    indicators[this.currentImageIndex].classList.add('active');
+  }
+  
+  goToImage(index) {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    
+    if (slides.length === 0 || index >= slides.length) return;
+    
+    slides[this.currentImageIndex].classList.remove('active');
+    indicators[this.currentImageIndex].classList.remove('active');
+    
+    this.currentImageIndex = index;
+    
+    slides[this.currentImageIndex].classList.add('active');
+    indicators[this.currentImageIndex].classList.add('active');
   }
 
   // Helper functions
