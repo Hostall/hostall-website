@@ -14,7 +14,14 @@ class HostelManager {
 
   // Initialize the hostel manager
   async init() {
-    await this.loadHostels();
+    // Check if hostels are already loaded by app
+    if (window.hostelData && window.hostelData.length > 0) {
+      this.hostels = window.hostelData;
+      console.log(`✅ Using pre-loaded hostels: ${this.hostels.length}`);
+    } else {
+      await this.loadHostels();
+    }
+    
     this.setupEventListeners();
     this.renderHostelCards();
   }
@@ -24,7 +31,8 @@ class HostelManager {
     try {
       const client = window.getSupabaseClient();
       if (!client) {
-        console.error('❌ Supabase client not available');
+        console.warn('⚠️ Supabase client not available, using sample data');
+        this.loadSampleData();
         return;
       }
 
@@ -34,15 +42,109 @@ class HostelManager {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('❌ Error loading hostels:', error);
+        console.warn('⚠️ Database error, using sample data:', error);
+        this.loadSampleData();
         return;
       }
 
-      this.hostels = hostels || [];
-      console.log(`✅ Loaded ${this.hostels.length} hostels from database`);
+      if (hostels && hostels.length > 0) {
+        this.hostels = hostels;
+        console.log(`✅ Loaded ${this.hostels.length} hostels from database`);
+      } else {
+        console.log('📝 No hostels in database, using sample data');
+        this.loadSampleData();
+      }
     } catch (error) {
-      console.error('❌ Exception loading hostels:', error);
+      console.warn('⚠️ Exception loading hostels, using sample data:', error);
+      this.loadSampleData();
     }
+  }
+
+  // Load sample data as fallback
+  loadSampleData() {
+    this.hostels = [
+      {
+        id: 1,
+        name: 'Al-Noor Boys Hostel',
+        gender: 'Male',
+        location: '150, Ali town, lahore',
+        phone: '+92-300-4909528',
+        whatsapp: '+92-300-4909528',
+        rent: '12000',
+        security_deposit: '15000',
+        admission_fee: '2000',
+        details: 'Modern hostel with all facilities including WiFi, AC, security, and study rooms. Located in a safe area with easy access to universities.',
+        facilities: ['WiFi', 'AC', 'Security', 'Laundry', 'Study Room'],
+        img: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=400&fit=crop',
+        gallery: [
+          'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop'
+        ]
+      },
+      {
+        id: 2,
+        name: 'Al-Noor Girls Hostel',
+        gender: 'Female',
+        location: 'Ali Town & Sultan Town, Lahore',
+        phone: '+92-300-4909528',
+        whatsapp: '+92-300-4909528',
+        rent: '11000',
+        security_deposit: '12000',
+        admission_fee: '1500',
+        details: 'Safe and secure hostel for girls with 24/7 security, modern amenities, and a friendly environment. Close to major universities.',
+        facilities: ['WiFi', 'Security', 'Laundry', 'Kitchen', 'Study Area'],
+        img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop',
+        gallery: [
+          'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=400&fit=crop'
+        ]
+      },
+      {
+        id: 3,
+        name: 'Green Valley Hostel',
+        gender: 'Male',
+        location: 'Model Town, Lahore',
+        phone: '+92-321-7654321',
+        whatsapp: '+92-321-7654321',
+        rent: '15000',
+        security_deposit: '18000',
+        admission_fee: '3000',
+        details: 'Premium hostel with excellent facilities including gym, library, and recreational areas. Perfect for serious students.',
+        facilities: ['WiFi', 'AC', 'Gym', 'Library', 'Parking', 'Meals'],
+        img: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=400&fit=crop',
+        gallery: [
+          'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop'
+        ]
+      },
+      {
+        id: 4,
+        name: 'Comfort Inn Girls Hostel',
+        gender: 'Female',
+        location: 'Gulberg, Lahore',
+        phone: '+92-333-1234567',
+        whatsapp: '+92-333-1234567',
+        rent: '18000',
+        security_deposit: '20000',
+        admission_fee: '2500',
+        details: 'Luxury hostel for girls with premium amenities, spacious rooms, and excellent dining facilities. Located in upscale area.',
+        facilities: ['WiFi', 'AC', 'Security', 'Meals', 'Gym', 'Study Room', 'Parking'],
+        img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop',
+        gallery: [
+          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop',
+          'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=400&fit=crop'
+        ]
+      }
+    ];
+    console.log(`✅ Loaded ${this.hostels.length} sample hostels`);
   }
 
   // Render hostel cards
@@ -58,14 +160,13 @@ class HostelManager {
     }
 
     hostelGrid.innerHTML = '';
-    console.log('🏗️ Rendering hostel cards for:', filteredHostels.map(h => h.name));
 
     filteredHostels.forEach(hostel => {
       const card = this.createHostelCard(hostel);
       hostelGrid.appendChild(card);
     });
 
-    console.log('✅ Rendered', filteredHostels.length, 'hostel cards');
+    console.log(`✅ Displayed ${filteredHostels.length} hostels`);
   }
 
   // Create individual hostel card
