@@ -70,14 +70,14 @@ console.log('\n6️⃣ Testing Manual Display...');
 if (typeof directSync !== 'undefined' && directSync.displayManually) {
   const testHostels = [
     {
-      id: 7,
+      id: 9,
       name: 'Al-Noor Boys Hostel',
       gender: 'Male',
       location: '150, Ali town, lahore',
       phone: '+92-300-4909528'
     },
     {
-      id: 8,
+      id: 4,
       name: 'Al-Noor Girls Hostel',
       gender: 'Female',
       location: 'Ali Town & Sultan Town, Lahore',
