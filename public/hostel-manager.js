@@ -14,14 +14,7 @@ class HostelManager {
 
   // Initialize the hostel manager
   async init() {
-    // Check if hostels are already loaded by app
-    if (window.hostelData && window.hostelData.length > 0) {
-      this.hostels = window.hostelData;
-      console.log(`✅ Using pre-loaded hostels: ${this.hostels.length}`);
-    } else {
-      await this.loadHostels();
-    }
-    
+    await this.loadHostels();
     this.setupEventListeners();
     this.renderHostelCards();
   }
@@ -31,7 +24,7 @@ class HostelManager {
     try {
       const client = window.getSupabaseClient();
       if (!client) {
-        console.warn('⚠️ Supabase client not available, using sample data');
+        console.error('❌ Supabase client not available, using sample data');
         this.loadSampleData();
         return;
       }
@@ -46,16 +39,15 @@ class HostelManager {
         this.loadSampleData();
         return;
       }
-
-      if (hostels && hostels.length > 0) {
-        this.hostels = hostels;
+      
+        this.hostels = hostels || []
         console.log(`✅ Loaded ${this.hostels.length} hostels from database`);
       } else {
         console.log('📝 No hostels in database, using sample data');
         this.loadSampleData();
       }
     } catch (error) {
-      console.warn('⚠️ Exception loading hostels, using sample data:', error);
+      console.error('⚠️ Exception loading hostels, using sample data:', error);
       this.loadSampleData();
     }
   }
@@ -160,13 +152,14 @@ class HostelManager {
     }
 
     hostelGrid.innerHTML = '';
-
+    console.log('🏗️ Rendering hostel cards for:', filteredHostels.map(h => h.name));
+    
     filteredHostels.forEach(hostel => {
       const card = this.createHostelCard(hostel);
       hostelGrid.appendChild(card);
     });
 
-    console.log(`✅ Displayed ${filteredHostels.length} hostels`);
+     console.log('✅ Rendered', filteredHostels.length, 'hostel cards');
   }
 
   // Create individual hostel card
