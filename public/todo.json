@@ -1,0 +1,1 @@
+[{"id":"CACHE-1","content":"Add cache-busting mechanisms to force refresh","status":"completed","priority":"high"},{"id":"CACHE-2","content":"Add version timestamp for debugging","status":"completed","priority":"medium"},{"id":"CACHE-3","content":"Provide cache clearing instructions","status":"completed","priority":"medium"}]
