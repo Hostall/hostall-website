@@ -439,7 +439,7 @@ ${hostel.map ? '🗺️ View on Google Maps: ' + hostel.map : '❌ Map not provi
 
   // Get simple details format
   getSimpleDetails(hostel, facilities) {
-    return `HOSTEL DETAILS
+    return \`HOSTEL DETAILS
 
 📍 Name: ${hostel.name || 'Not specified'}
 👥 Gender: ${hostel.gender || 'Any'}
@@ -462,7 +462,7 @@ ${hostel.map ? '🗺️ View on map: ' + hostel.map : '❌ Map not provided'}`;
     if (hostel.img) {
       images.push({
         url: hostel.img,
-        alt: `${hostel.name} - Main View`,
+        alt: \`${hostel.name} - Main View`,
         title: 'Main View'
       });
     }
@@ -472,8 +472,8 @@ ${hostel.map ? '🗺️ View on map: ' + hostel.map : '❌ Map not provided'}`;
       hostel.gallery.forEach((img, index) => {
         images.push({
           url: img.url || img,
-          alt: `${hostel.name} - Image ${index + 2}`,
-          title: img.title || `View ${index + 2}`
+          alt: \`${hostel.name} - Image ${index + 2}`,
+          title: img.title || \`View ${index + 2}`
         });
       });
     }
@@ -482,7 +482,7 @@ ${hostel.map ? '🗺️ View on map: ' + hostel.map : '❌ Map not provided'}`;
     if (images.length === 0) {
       images.push({
         url: this.getPlaceholderImage(hostel),
-        alt: `${hostel.name} - Placeholder`,
+        alt: \`${hostel.name} - Placeholder`,
         title: 'Hostel Image'
       });
     }
@@ -542,7 +542,7 @@ ${hostel.map ? '🗺️ View on map: ' + hostel.map : '❌ Map not provided'}`;
   getPlaceholderImage(hostel) {
     const genderColor = hostel.gender === 'Female' ? 'ff69b4' : 
                        hostel.gender === 'Male' ? '4169e1' : '6b7280';
-    return `https://via.placeholder.com/300x200/${genderColor}/ffffff?text=${encodeURIComponent(hostel.name || 'Hostel')}`;
+    return \`https://via.placeholder.com/300x200/${genderColor}/ffffff?text=${encodeURIComponent(hostel.name || 'Hostel')}`;
   }
 
   getShortLocation(location) {
