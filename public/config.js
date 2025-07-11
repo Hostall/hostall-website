@@ -46,3 +46,7 @@ window.getSupabaseClient = () => {
 // Export for use in other modules
 window.CONFIG = CONFIG;
 window.initializeSupabase = initializeSupabase;
+
+// ✅ Automatically initialize Supabase on page load
+initializeSupabase();
+
