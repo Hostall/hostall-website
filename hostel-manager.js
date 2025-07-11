@@ -92,7 +92,7 @@ class HostelManager {
         <div class="hostel-contact" style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
           ${hostel.phone ? `📞 ${hostel.phone}` : ''}
         </div>
-        <button class="view-details-btn" onclick="hostelManager.showHostelDetails(${JSON.stringify(hostel).replace(/"/g, '&quot;')})">
+        <button class="view-details-btn" onclick="window.hostelManager.showHostelDetails(${JSON.stringify(hostel).replace(/"/g, '&quot;')})">
           View Details
         </button>
       </div>
@@ -103,8 +103,173 @@ class HostelManager {
 
   // Show hostel details popup
   showHostelDetails(hostel) {
-    // Navigate to details page instead of showing popup
-    openHostelDetailsPage(hostel.id);
+    // Create and show hostel details modal
+    this.createHostelDetailsModal(hostel);
+  }
+
+  // Create hostel details modal
+  createHostelDetailsModal(hostel) {
+    // Remove any existing modal
+    const existingModal = document.getElementById('hostel-details-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Create modal
+    const modal = document.createElement('div');
+    modal.id = 'hostel-details-modal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+    
+    // Get facilities list
+    const facilities = Array.isArray(hostel.facilities) ? hostel.facilities : 
+                      (hostel.facilities ? hostel.facilities.split(',') : []);
+    
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b">
+          <h2 class="text-2xl font-bold text-gray-900">${hostel.name}</h2>
+          <button onclick="this.closest('#hostel-details-modal').remove()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-6">
+          <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Left Column - Image and Basic Info -->
+            <div>
+              <div class="mb-6">
+                <img src="${hostel.img || 'https://via.placeholder.com/400x300/6b7280/ffffff?text=' + encodeURIComponent(hostel.name)}" 
+                     alt="${hostel.name}" 
+                     class="w-full h-64 object-cover rounded-lg"
+                     onerror="this.src='https://via.placeholder.com/400x300/6b7280/ffffff?text=Hostel+Image'">
+              </div>
+              
+              <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-full text-sm font-medium ${hostel.gender === 'Male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'}">
+                    ${hostel.gender} Only
+                  </span>
+                </div>
+                
+                <div class="flex items-start gap-3">
+                  <i class="hgi-stroke hgi-location-01 text-gray-500 mt-1"></i>
+                  <div>
+                    <p class="font-medium text-gray-900">Location</p>
+                    <p class="text-gray-600">${hostel.location}</p>
+                  </div>
+                </div>
+                
+                ${hostel.rent ? `
+                <div class="flex items-start gap-3">
+                  <i class="hgi-stroke hgi-money-bag-02 text-gray-500 mt-1"></i>
+                  <div>
+                    <p class="font-medium text-gray-900">Monthly Rent</p>
+                    <p class="text-gray-600">Rs. ${hostel.rent}</p>
+                  </div>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+            
+            <!-- Right Column - Details and Contact -->
+            <div>
+              <!-- Contact Information -->
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4">Contact Information</h3>
+                <div class="space-y-3">
+                  ${hostel.phone ? `
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <i class="hgi-stroke hgi-call text-green-600"></i>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-600">Phone</p>
+                      <p class="font-medium">${hostel.phone}</p>
+                    </div>
+                  </div>
+                  ` : ''}
+                  
+                  ${hostel.whatsapp ? `
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <i class="hgi-stroke hgi-whatsapp text-green-600"></i>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-600">WhatsApp</p>
+                      <p class="font-medium">${hostel.whatsapp}</p>
+                    </div>
+                  </div>
+                  ` : ''}
+                </div>
+              </div>
+              
+              <!-- Facilities -->
+              ${facilities.length > 0 ? `
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4">Facilities</h3>
+                <div class="flex flex-wrap gap-2">
+                  ${facilities.map(facility => `
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                      ${facility.trim()}
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+              ` : ''}
+              
+              <!-- Description -->
+              ${hostel.details ? `
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4">Description</h3>
+                <p class="text-gray-600 leading-relaxed">${hostel.details}</p>
+              </div>
+              ` : ''}
+              
+              <!-- Action Buttons -->
+              <div class="space-y-3">
+                ${hostel.phone ? `
+                <button onclick="window.open('tel:${hostel.phone}', '_self')" 
+                        class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <i class="hgi-stroke hgi-call"></i>
+                  <span>Call Now</span>
+                </button>
+                ` : ''}
+                
+                ${hostel.whatsapp ? `
+                <button onclick="window.open('https://wa.me/${hostel.whatsapp.replace(/[^0-9]/g, '')}?text=Hi, I found your hostel on HOSTALL and I\\'m interested in learning more.', '_blank')" 
+                        class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                  <i class="hgi-stroke hgi-whatsapp"></i>
+                  <span>WhatsApp Chat</span>
+                </button>
+                ` : ''}
+                
+                ${hostel.location ? `
+                <button onclick="window.open('https://www.google.com/maps/search/${encodeURIComponent(hostel.location)}', '_blank')" 
+                        class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                  <i class="hgi-stroke hgi-location-01"></i>
+                  <span>View on Map</span>
+                </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add click outside to close
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+    
+    // Add to page
+    document.body.appendChild(modal);
   }
 
   // Get enhanced details format
